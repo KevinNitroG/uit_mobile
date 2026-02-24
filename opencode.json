@@ -10,7 +10,7 @@
   },
   "agent": {
     "compaction": {
-      "model": "github-copilot/gpt-4.1"
+      "model": "github-copilot/claude-sonnet-4.6"
     },
     "build": {
       "model": "github-copilot/claude-opus-4.6"

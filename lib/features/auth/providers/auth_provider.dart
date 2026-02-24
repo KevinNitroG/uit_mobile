@@ -70,16 +70,25 @@ class AuthNotifier extends Notifier<AuthState> {
     return const AuthLoading();
   }
 
-  /// Checks for an existing session on app start and proactively refreshes
-  /// the token to ensure it's valid.
+  /// Checks for an existing session on app start.
+  ///
+  /// Authenticates immediately with the cached token so the UI can show cached
+  /// data right away, then refreshes the token in the background.
   Future<void> _restoreSession() async {
     try {
       final session = await _storage.getActiveSession();
       if (session != null && session.token != null) {
-        // Proactively refresh the token on every app entry so we always start
-        // with a fresh token rather than waiting for a 401.
-        final refreshed = await _refreshToken(session);
-        state = AuthAuthenticated(refreshed ?? session);
+        // Authenticate immediately so cached data renders instantly.
+        state = AuthAuthenticated(session);
+
+        // Refresh the token in the background. The JWT interceptor handles
+        // 401s as a fallback if the existing token expires before this finishes.
+        Future(() async {
+          final refreshed = await _refreshToken(session);
+          if (refreshed != null) {
+            state = AuthAuthenticated(refreshed);
+          }
+        });
       } else {
         // No active session — check if there are saved sessions the user can pick.
         final sessions = await _storage.getSessions();
@@ -90,15 +99,6 @@ class AuthNotifier extends Notifier<AuthState> {
         }
       }
     } catch (e) {
-      // If refresh fails, try using the existing session anyway. The JWT
-      // interceptor can still handle 401s as a fallback.
-      try {
-        final session = await _storage.getActiveSession();
-        if (session != null && session.token != null) {
-          state = AuthAuthenticated(session);
-          return;
-        }
-      } catch (_) {}
       state = const AuthUnauthenticated();
     }
   }
@@ -131,6 +131,7 @@ class AuthNotifier extends Notifier<AuthState> {
     await _cache.clearBox(HiveBoxes.deadlines);
     await _cache.clearBox(HiveBoxes.userInfo);
     await _cache.clearBox(HiveBoxes.exams);
+    await _cache.clearBox(HiveBoxes.fees);
   }
 
   /// Logs in with [studentId] and [password].

@@ -65,7 +65,7 @@ class StudentDataNotifier extends AsyncNotifier<StudentData> {
       final cached = StudentData(
         coursesRaw: cachedCourses,
         scoresRaw: cache.getCachedScores() ?? [],
-        feeRaw: [],
+        feeRaw: cache.getCachedFees() ?? [],
         notifyRaw: cache.getCachedNotifications() ?? [],
         deadlineRaw: cache.getCachedDeadlines() ?? [],
         examsRaw: cache.getCachedExams() ?? {},

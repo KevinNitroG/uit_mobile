@@ -21,4 +21,5 @@ abstract final class HiveBoxes {
   static const String deadlines = 'deadlines';
   static const String userInfo = 'user_info';
   static const String exams = 'exams';
+  static const String fees = 'fees';
 }
