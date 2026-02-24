@@ -100,7 +100,7 @@ class SettingsScreen extends ConsumerWidget {
             child: ListTile(
               leading: const Icon(Icons.info_outline),
               title: const Text('UIT Mobile'),
-              subtitle: const Text('v0.1.0'),
+              subtitle: const Text('v0.1.0'), // x-release-please-version
             ),
           ),
         ],
