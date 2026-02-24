@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.0](https://github.com/KevinNitroG/uit_mobile/compare/v0.3.0...v1.0.0) (2026-02-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* **exams, deadlines, fees:** Exam and Deadline model fields as enums/booleans, may affect consumers
+
+### Features
+
+* **exams, deadlines, fees:** robust data parsing and user-friendly display ([26c37a8](https://github.com/KevinNitroG/uit_mobile/commit/26c37a88be06971596a4439d680b8f8453168f5e))
+* general score screen, maybe it is overview or something ([0c401fc](https://github.com/KevinNitroG/uit_mobile/commit/0c401fc4265d0ef42f905cd52cf9d413c2bd3567))
+
+
+### Bug Fixes
+
+* **fees, auth:** wire fees into Hive cache and restore instant startup ([61b6b38](https://github.com/KevinNitroG/uit_mobile/commit/61b6b38fdd7ad220db641ef447354520e9c13b2f))
+
 ## [0.3.0](https://github.com/KevinNitroG/uit_mobile/compare/v0.2.0...v0.3.0) (2026-02-24)
 
 
