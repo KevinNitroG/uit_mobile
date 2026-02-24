@@ -1,0 +1,90 @@
+{
+  "login": {
+    "subtitle": "Đăng nhập bằng tài khoản UIT",
+    "studentId": "Mã số sinh viên",
+    "studentIdRequired": "Vui lòng nhập MSSV",
+    "password": "Mật khẩu",
+    "passwordRequired": "Vui lòng nhập mật khẩu",
+    "signIn": "Đăng nhập"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "timetable": "TKB",
+    "deadlines": "Deadline",
+    "scores": "Điểm",
+    "notifications": "Thông báo",
+    "settings": "Cài đặt"
+  },
+  "home": {
+    "title": "Trang chủ",
+    "logout": "Đăng xuất",
+    "overview": "Tổng quan",
+    "major": "Ngành",
+    "class": "Lớp",
+    "email": "Email",
+    "dob": "Ngày sinh",
+    "courses": "Môn học",
+    "deadlines": "Deadline"
+  },
+  "accounts": {
+    "title": "Tài khoản",
+    "noAccounts": "Chưa có tài khoản nào",
+    "addAccount": "Thêm tài khoản",
+    "active": "Đang dùng",
+    "switchTo": "Chuyển sang tài khoản này",
+    "removeTitle": "Xóa tài khoản",
+    "removeConfirm": "Xóa tài khoản {}?"
+  },
+  "timetable": {
+    "title": "Thời khóa biểu",
+    "noCourses": "Không có môn học nào",
+    "period": "Tiết {}",
+    "periodInfo": "Chi tiết tiết học"
+  },
+  "deadlines": {
+    "title": "Deadline",
+    "noDeadlines": "Không có deadline sắp tới",
+    "filterAll": "Tất cả",
+    "filterPending": "Chưa nộp",
+    "filterFinished": "Đã nộp",
+    "filterOverdue": "Quá hạn",
+    "submitted": "Đã nộp",
+    "overdue": "Quá hạn"
+  },
+  "scores": {
+    "title": "Điểm",
+    "noScores": "Chưa có điểm",
+    "subjectCount": "{} môn",
+    "credits": "tín chỉ",
+    "component": "Thành phần",
+    "grade": "Điểm",
+    "weight": "Trọng số",
+    "component1": "QT (Quá trình)",
+    "component2": "TH (Thực hành)",
+    "component3": "GK (Giữa kỳ)",
+    "component4": "CK (Cuối kỳ)",
+    "final": "Tổng kết",
+    "semesterGpa": "GPA học kỳ",
+    "overallGpa": "GPA tích lũy",
+    "totalCredits": "Tổng tín chỉ",
+    "exempted": "Miễn"
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "searchHint": "Tìm kiếm thông báo...",
+    "noNotifications": "Không có thông báo"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "language": "Ngôn ngữ",
+    "account": "Tài khoản",
+    "about": "Thông tin",
+    "logoutTitle": "Đăng xuất",
+    "logoutConfirm": "Bạn có chắc chắn muốn đăng xuất?"
+  },
+  "common": {
+    "retry": "Thử lại",
+    "cancel": "Hủy",
+    "remove": "Xóa"
+  }
+}

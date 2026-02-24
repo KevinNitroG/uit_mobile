@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/deadlines_widget"
+    android:minWidth="250dp"
+    android:minHeight="180dp"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="3"
+    android:targetCellHeight="3"
+    android:widgetCategory="home_screen"
+    android:updatePeriodMillis="3600000"
+    android:description="@string/deadlines_widget_description"
+    android:previewLayout="@layout/deadlines_widget" />

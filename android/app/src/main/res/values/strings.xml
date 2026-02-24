@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="timetable_widget_description">Shows today\'s class schedule</string>
+    <string name="deadlines_widget_description">Shows upcoming assignment deadlines</string>
+</resources>

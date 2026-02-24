@@ -1,0 +1,90 @@
+{
+  "login": {
+    "subtitle": "Sign in with your UIT account",
+    "studentId": "Student ID",
+    "studentIdRequired": "Student ID is required",
+    "password": "Password",
+    "passwordRequired": "Password is required",
+    "signIn": "Sign In"
+  },
+  "nav": {
+    "home": "Home",
+    "timetable": "Timetable",
+    "deadlines": "Deadlines",
+    "scores": "Scores",
+    "notifications": "Alerts",
+    "settings": "Settings"
+  },
+  "home": {
+    "title": "Home",
+    "logout": "Logout",
+    "overview": "Overview",
+    "major": "Major",
+    "class": "Class",
+    "email": "Email",
+    "dob": "DOB",
+    "courses": "Courses",
+    "deadlines": "Deadlines"
+  },
+  "accounts": {
+    "title": "Accounts",
+    "noAccounts": "No accounts saved",
+    "addAccount": "Add Account",
+    "active": "Active",
+    "switchTo": "Switch to this account",
+    "removeTitle": "Remove Account",
+    "removeConfirm": "Remove account {}?"
+  },
+  "timetable": {
+    "title": "Timetable",
+    "noCourses": "No courses found",
+    "period": "Period {}",
+    "periodInfo": "Period Info"
+  },
+  "deadlines": {
+    "title": "Deadlines",
+    "noDeadlines": "No upcoming deadlines",
+    "filterAll": "All",
+    "filterPending": "Pending",
+    "filterFinished": "Finished",
+    "filterOverdue": "Overdue",
+    "submitted": "Submitted",
+    "overdue": "Overdue"
+  },
+  "scores": {
+    "title": "Scores",
+    "noScores": "No scores found",
+    "subjectCount": "{} subjects",
+    "credits": "credits",
+    "component": "Component",
+    "grade": "Grade",
+    "weight": "Weight",
+    "component1": "QT (Process)",
+    "component2": "TH (Practice)",
+    "component3": "GK (Midterm)",
+    "component4": "CK (Final)",
+    "final": "Final",
+    "semesterGpa": "Semester GPA",
+    "overallGpa": "Overall GPA",
+    "totalCredits": "Total Credits",
+    "exempted": "Exempted"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "searchHint": "Search notifications...",
+    "noNotifications": "No notifications"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "account": "Account",
+    "about": "About",
+    "logoutTitle": "Logout",
+    "logoutConfirm": "Are you sure you want to logout?"
+  },
+  "common": {
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "remove": "Remove"
+  }
+}

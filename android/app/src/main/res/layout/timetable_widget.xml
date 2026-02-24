@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@android:color/system_accent1_50">
+
+    <TextView
+        android:id="@+id/text_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Today's Classes"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/system_accent1_900"
+        android:paddingBottom="8dp" />
+
+    <TextView
+        android:id="@+id/text_course_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@android:color/system_neutral1_900"
+        android:visibility="gone"
+        android:paddingBottom="4dp" />
+
+    <TextView
+        android:id="@+id/text_course_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@android:color/system_neutral1_900"
+        android:visibility="gone"
+        android:paddingBottom="4dp" />
+
+    <TextView
+        android:id="@+id/text_course_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@android:color/system_neutral1_900"
+        android:visibility="gone"
+        android:paddingBottom="4dp" />
+
+    <TextView
+        android:id="@+id/text_course_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@android:color/system_neutral1_900"
+        android:visibility="gone"
+        android:paddingBottom="4dp" />
+
+    <TextView
+        android:id="@+id/text_course_5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@android:color/system_neutral1_900"
+        android:visibility="gone"
+        android:paddingBottom="4dp" />
+
+    <TextView
+        android:id="@+id/text_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No classes today"
+        android:textSize="12sp"
+        android:textColor="@android:color/system_neutral1_500"
+        android:visibility="gone"
+        android:gravity="center"
+        android:paddingTop="16dp" />
+
+    <TextView
+        android:id="@+id/text_updated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="@android:color/system_neutral1_500"
+        android:layout_marginTop="4dp"
+        android:gravity="end" />
+
+</LinearLayout>
