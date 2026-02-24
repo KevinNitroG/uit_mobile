@@ -81,7 +81,12 @@
     "semesterGpa": "GPA học kỳ",
     "overallGpa": "GPA tích lũy",
     "totalCredits": "Tổng tín chỉ",
-    "exempted": "Miễn"
+    "exempted": "Miễn",
+    "generalView": "Tổng quan",
+    "generalViewTitle": "Bảng điểm tổng quan",
+    "subjectCode": "MAMH",
+    "classCode": "Lớp",
+    "noGrade": "-"
   },
   "notifications": {
     "title": "Thông báo",

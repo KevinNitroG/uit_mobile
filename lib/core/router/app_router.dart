@@ -7,6 +7,7 @@ import 'package:uit_mobile/features/auth/presentation/login_screen.dart';
 import 'package:uit_mobile/features/auth/providers/auth_provider.dart';
 import 'package:uit_mobile/features/fees/presentation/fees_screen.dart';
 import 'package:uit_mobile/features/notifications/presentation/notifications_screen.dart';
+import 'package:uit_mobile/features/scores/presentation/general_scores_screen.dart';
 import 'package:uit_mobile/features/settings/presentation/debug_screen.dart';
 import 'package:uit_mobile/features/settings/presentation/settings_screen.dart';
 import 'package:uit_mobile/features/timetable/presentation/period_info_screen.dart';
@@ -105,6 +106,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'fees',
             builder: (context, state) => const FeesScreen(),
+          ),
+          GoRoute(
+            path: 'scores/general',
+            builder: (context, state) => const GeneralScoresScreen(),
           ),
           GoRoute(
             path: 'debug',

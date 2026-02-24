@@ -81,7 +81,12 @@
     "semesterGpa": "Semester GPA",
     "overallGpa": "Overall GPA",
     "totalCredits": "Total Credits",
-    "exempted": "Exempted"
+    "exempted": "Exempted",
+    "generalView": "General View",
+    "generalViewTitle": "Score Overview",
+    "subjectCode": "Code",
+    "classCode": "Class",
+    "noGrade": "-"
   },
   "notifications": {
     "title": "Notifications",

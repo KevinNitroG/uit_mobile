@@ -17,6 +17,7 @@ Trollstore quick link: [![Trollstore](https://img.shields.io/badge/trollstore-89
 
 ## Feature
 
+- [x] Tuition fees screen (in setting account screen)
 - [x] GPA calculation
 - [-] System authentication
   - [x] Android

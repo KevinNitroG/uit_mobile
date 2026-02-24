@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
@@ -52,7 +53,16 @@ class ScoresScreen extends ConsumerWidget {
     final scoresAsync = ref.watch(scoresProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text('scores.title'.tr())),
+      appBar: AppBar(
+        title: Text('scores.title'.tr()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.table_chart_outlined),
+            tooltip: 'scores.generalView'.tr(),
+            onPressed: () => context.go('/scores/general'),
+          ),
+        ],
+      ),
       body: scoresAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
