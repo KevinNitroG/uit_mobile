@@ -7,5 +7,22 @@
       "enabled": true,
       "environment": {}
     }
+  },
+  "agent": {
+    "compaction": {
+      "model": "github-copilot/gpt-4.1"
+    },
+    "build": {
+      "model": "github-copilot/claude-opus-4.6"
+    },
+    "plan": {
+      "model": "github-copilot/gemini-3.1-pro-preview"
+    },
+    "general": {
+      "model": "github-copilot/claude-sonnet-4.6"
+    },
+    "explore": {
+      "model": "github-copilot/claude-haiku-4.5"
+    }
   }
 }
