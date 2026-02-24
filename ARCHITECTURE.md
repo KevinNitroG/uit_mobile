@@ -2,7 +2,7 @@
 
 ## Overview
 
-**UIT Mobile** is a Flutter application (Android & iOS) for University of Information Technology (UIT) students. It provides a mobile interface to access timetables, scores, deadlines, notifications, and account management through the UIT API.
+**UIT Mobile** is a Flutter application (Android & iOS) for University of Information Technology (UIT) students. It provides a mobile interface to access timetables, scores, exams, deadlines, tuition fees, notifications, and account management through the UIT API.
 
 **Author**: KevinNitroG  
 **Package Name**: `com.kevinnitro.uit_mobile` (Android), `com.kevinnitro.uitMobile` (iOS)  
@@ -18,84 +18,98 @@
 ```
 uit-mobile/
 ├── lib/
+│   ├── main.dart                          # App entry: Hive init, HomeWidget init, ProviderScope, EasyLocalization
+│   │
 │   ├── core/
 │   │   ├── network/
-│   │   │   ├── dio_client.dart           # Dio HTTP client with JWT interceptor
-│   │   │   ├── jwt_interceptor.dart      # Auto-refresh JWT on 401, request queuing
-│   │   │   └── api_service.dart          # Typed API endpoint wrappers
+│   │   │   ├── dio_client.dart            # Dio HTTP client (baseUrl, timeouts, JwtInterceptor, LogInterceptor)
+│   │   │   ├── jwt_interceptor.dart       # Auto-refresh JWT on 401, request queuing with _pendingRequests
+│   │   │   └── api_service.dart           # Typed API endpoint wrappers (generateToken, getUserInfo, getStudentData, etc.)
 │   │   ├── router/
-│   │   │   └── app_router.dart           # GoRouter config: /login, /, /accounts, /notifications, /settings, /period-info
+│   │   │   └── app_router.dart            # GoRouter config with auth guard redirect logic
 │   │   ├── storage/
-│   │   │   ├── secure_storage_service.dart      # Multi-account JWT CRUD
-│   │   │   ├── hive_cache_service.dart          # Offline-first caching
-│   │   │   └── home_widget_service.dart         # Timetable & deadline data → home screen widgets
+│   │   │   ├── secure_storage_service.dart       # Multi-account JWT CRUD (getSessions, upsertSession, getActiveSession, etc.)
+│   │   │   ├── hive_cache_service.dart           # Offline-first caching (boxes: courses, scores, notifications, deadlines, userInfo, exams, fees)
+│   │   │   └── home_widget_service.dart          # Timetable & deadline data → native home screen widgets (Android + iOS)
 │   │   ├── theme/
-│   │   │   └── app_theme.dart            # Material 3 light + dark themes
+│   │   │   └── app_theme.dart             # Material 3 light + dark themes (primary=#1565C0, secondary=#00897B)
 │   │   └── utils/
-│   │       ├── constants.dart            # API URL, Hive box names, secure storage keys
-│   │       └── encoding.dart             # UIT auth encoding: encodeCredentials(), encodeToken()
+│   │       ├── constants.dart             # API URL, encoding prefix, auth scheme, storage keys, Hive box names
+│   │       └── encoding.dart              # UIT auth encoding: encodeCredentials(), encodeToken()
 │   │
 │   ├── shared/
 │   │   ├── models/
-│   │   │   ├── models.dart               # Barrel file exporting all models
-│   │   │   ├── user_session.dart         # JWT tokens (access, refresh, expired_at)
-│   │   │   ├── user_info.dart            # User profile (name, class, email, etc)
-│   │   │   ├── course.dart               # Course (day group) + Semester
-│   │   │   ├── score.dart                # Score (final, components) + ScoreSemester
-│   │   │   ├── fee.dart                  # Fee data
-│   │   │   ├── notification.dart         # Notification data
-│   │   │   ├── deadline.dart             # Deadline with status (pending/finished/overdue)
-│   │   │   └── student_data.dart         # Aggregate: courses, scores, fees, notifications, deadlines
+│   │   │   ├── models.dart                # Barrel file exporting all models
+│   │   │   ├── user_session.dart          # UserSession: studentId, encodedCredentials, token, encodedToken, tokenExpiry, name, avatarHash
+│   │   │   ├── user_info.dart             # UserInfo: name, sid, mail, status, course, major, dob, role, className, address, avatar
+│   │   │   ├── course.dart                # Course (classCode, room, lecturer, dayOfWeek, periods) + Semester (day group)
+│   │   │   ├── score.dart                 # Score (grades, weights, isExempted, countsForGpa) + ScoreSemester
+│   │   │   ├── exam.dart                  # Exam: parsed from flat API map, getters for date/room/time/subjectName/subjectCode via regex
+│   │   │   ├── fee.dart                   # Fee: amountDue, amountPaid, semester, year, dkhp; getter for parsed subjects
+│   │   │   ├── notification.dart          # UitNotification: id, title, content, dated
+│   │   │   ├── deadline.dart              # Deadline: shortname, name, niceDate, status (pending/overdue/submitted), closed
+│   │   │   └── student_data.dart          # StudentData: raw JSON wrapper (coursesRaw, scoresRaw, feeRaw, notifyRaw, deadlineRaw, examsRaw)
 │   │   └── widgets/
-│   │       └── main_shell.dart           # MainShell: 4-tab bottom nav (Home, TKB, Deadlines, Scores)
+│   │       └── main_shell.dart            # MainShell: 5-tab bottom nav (Home, TKB, Deadlines, Exams, Scores)
 │   │
 │   └── features/
 │       ├── auth/
 │       │   ├── providers/
-│       │   │   └── auth_provider.dart    # AuthNotifier: login, switch, remove, logout (auto-restore on startup)
+│       │   │   └── auth_provider.dart     # AuthNotifier (sealed states: Initial/Loading/Authenticated/Unauthenticated/NeedsAccountSelection/Error)
 │       │   └── presentation/
-│       │       ├── login_screen.dart     # Login with Student ID + password, multi-account support
-│       │       └── accounts_screen.dart  # Switch/remove accounts, add account via FAB
+│       │       ├── login_screen.dart       # Login with Student ID + password, addAccount mode
+│       │       ├── accounts_screen.dart    # Switch/remove accounts, add account via FAB
+│       │       └── account_switcher_screen.dart # Startup account selection when multiple saved, none active
 │       │
 │       ├── home/
 │       │   ├── providers/
-│       │   │   └── data_providers.dart   # AsyncNotifier providers: studentData, courses, scores, etc (cache-first)
+│       │   │   └── data_providers.dart    # studentDataProvider (AsyncNotifier, cache-first), userInfoProvider, derived: courses/scores/fees/notifications/deadlines/exams
 │       │   └── presentation/
-│       │       └── home_screen.dart      # User overview, quick stats, refresh, app bar actions (notifications, settings, accounts)
+│       │       └── home_screen.dart       # Profile card, overview stats (courses, deadlines as remaining/total), tuition fees summary with nav to /fees
 │       │
 │       ├── timetable/
 │       │   └── presentation/
-│       │       ├── timetable_screen.dart # TabBar day navigation (Mon-Sun), today auto-selected, swipeable
-│       │       └── period_info_screen.dart # All 10 UIT periods with time ranges
+│       │       ├── timetable_screen.dart  # TabBar day navigation (Mon-Sun), today indicated with circled border, swipeable
+│       │       └── period_info_screen.dart # All 10 UIT periods with time ranges; morning=blue, afternoon=teal; current period highlighted with colored border
 │       │
 │       ├── deadlines/
 │       │   └── presentation/
-│       │       └── deadlines_screen.dart # Filter chips (All/Pending/Finished/Overdue), status badges
+│       │       └── deadlines_screen.dart  # Filter chips (All/Pending/Finished/Overdue), status badges, deadlineFilterProvider
+│       │
+│       ├── exams/
+│       │   └── presentation/
+│       │       └── exams_screen.dart      # Exam schedule with sort (asc/desc); cards colored by date: past (blue), current (teal+border), future (teal)
 │       │
 │       ├── scores/
 │       │   └── presentation/
-│       │       └── scores_screen.dart    # GPA (overall + per-semester), exempted courses ("Miễn"), component breakdown table
+│       │       ├── scores_screen.dart     # GPA (overall + per-semester), expandable subjects with component breakdown
+│       │       └── general_scores_screen.dart # Tabular score view (MAMH, LOP, TC, QT, TH, GK, CK, TB)
+│       │
+│       ├── fees/
+│       │   └── presentation/
+│       │       └── fees_screen.dart       # Fee summary (total due/paid/remaining) + per-semester cards with progress bars and registered subjects
 │       │
 │       ├── notifications/
 │       │   └── presentation/
-│       │       └── notifications_screen.dart # Search/filter notifications, accessible via top app bar
+│       │       └── notifications_screen.dart # Search/filter notifications, expandable tiles
 │       │
 │       └── settings/
 │           └── presentation/
-│               └── settings_screen.dart  # Language (VI/EN), account management, logout with confirmation
+│               ├── settings_screen.dart   # Language (VI/EN), account management, logout with confirmation
+│               └── debug_screen.dart      # Raw JSON API data viewer with copy buttons
 │
 ├── assets/
 │   ├── translations/
-│   │   ├── en.json                 # English localization
-│   │   └── vi.json                 # Vietnamese localization
+│   │   ├── en.json                  # English localization
+│   │   └── vi.json                  # Vietnamese localization
 │   └── images/
-│       └── uit_logo.png            # UIT logo (960x776 PNG)
+│       └── uit_logo.png             # UIT logo (960x776 PNG)
 │
 ├── android/
 │   ├── app/
-│   │   ├── build.gradle.kts        # namespace = "com.kevinnitro.uit_mobile", compileSdk=36, minSdk=33
+│   │   ├── build.gradle.kts         # namespace = "com.kevinnitro.uit_mobile", compileSdk=36, minSdk=33
 │   │   ├── src/main/
-│   │   │   ├── AndroidManifest.xml # app label = "UIT"
+│   │   │   ├── AndroidManifest.xml  # app label = "UIT"
 │   │   │   ├── kotlin/com/kevinnitro/uit_mobile/
 │   │   │   │   ├── MainActivity.kt
 │   │   │   │   ├── TimetableWidgetProvider.kt
@@ -116,35 +130,35 @@ uit-mobile/
 │
 ├── ios/
 │   ├── Runner/
-│   │   ├── Info.plist              # CFBundleDisplayName = "UIT", CFBundleName = "uit_mobile"
+│   │   ├── Info.plist               # CFBundleDisplayName = "UIT", CFBundleName = "uit_mobile"
 │   │   ├── Assets.xcassets/
-│   │   │   ├── AppIcon.appiconset/ # UIT logo (all sizes: 20x20 - 1024x1024)
+│   │   │   ├── AppIcon.appiconset/  # UIT logo (all sizes: 20x20 - 1024x1024)
 │   │   │   └── LaunchImage/
 │   │   └── GeneratedPluginRegistrant.swift
 │   │
 │   ├── Runner.xcodeproj/
-│   │   └── project.pbxproj         # PRODUCT_BUNDLE_IDENTIFIER = "com.kevinnitro.uitMobile"
+│   │   └── project.pbxproj          # PRODUCT_BUNDLE_IDENTIFIER = "com.kevinnitro.uitMobile"
 │   │
 │   ├── UitWidgets/
-│   │   ├── UitWidgets.swift        # SwiftUI home screen widgets (Timetable, Deadlines)
-│   │   └── Info.plist              # Widget bundle identifier
+│   │   ├── UitWidgets.swift         # SwiftUI home screen widgets (Timetable, Deadlines)
+│   │   └── Info.plist               # Widget bundle identifier
 │   │
-│   └── Podfile                     # CocoaPods dependencies
+│   └── Podfile                      # CocoaPods dependencies
 │
-├── pubspec.yaml                    # version: 0.1.0+1, dependencies (Riverpod 3.2.1, Dio, go_router, etc)
+├── pubspec.yaml                     # version: 0.1.0+1, dependencies (Riverpod 3.2.1, Dio, go_router, etc)
 ├── pubspec.lock
 │
 ├── .github/
 │   └── workflows/
-│       ├── release-please.yml      # Runs on main push, creates release PRs from conventional commits
-│       └── build.yml               # Analyze, build APK (arm64/armv7/x86_64), build IPA
+│       ├── release-please.yml       # Runs on main push, creates release PRs from conventional commits
+│       └── build.yml                # Analyze, build APK (arm64/armv7/x86_64), build IPA
 │
-├── release-please-config.json      # release-type: "dart"
-├── .release-please-manifest.json   # Current version tracking: {"."  : "0.1.0"}
+├── release-please-config.json       # release-type: "dart"
+├── .release-please-manifest.json    # Current version tracking: {"."  : "0.1.0"}
 │
-├── PLAN.md                         # Implementation plan + UIT API details
-├── uit.md                          # API endpoints, encodings, JSON schemas
-└── ARCHITECTURE.md                 # This file
+├── PLAN.md                          # Implementation plan + UIT API details
+├── uit.md                           # API endpoints, encodings, JSON schemas
+└── ARCHITECTURE.md                  # This file
 ```
 
 ---
@@ -177,8 +191,8 @@ uit-mobile/
 
 ### Internationalization
 
-- **easy_localization 3.0.8** - Dart-based i18n (EN/VI)
-- **intl 0.20.2** - Date formatting
+- **easy_localization 3.0.8** - Dart-based i18n (EN/VI), re-exports `intl`
+- **intl 0.20.2** - Date/currency formatting
 
 ### Serialization
 
@@ -194,6 +208,42 @@ uit-mobile/
 
 ---
 
+## Routing Configuration
+
+### Route Tree
+
+```
+/login (LoginScreen)
+  └─ ?addAccount=true (add new account mode)
+
+/account-switcher (AccountSwitcherScreen)
+
+/ (MainShell - authenticated root, 5-tab bottom nav)
+  ├─ Tab 0: HomeScreen
+  ├─ Tab 1: TimetableScreen
+  ├─ Tab 2: DeadlinesScreen
+  ├─ Tab 3: ExamsScreen
+  ├─ Tab 4: ScoresScreen
+  ├─ /accounts (AccountsScreen)
+  ├─ /notifications (NotificationsScreen)
+  ├─ /settings (SettingsScreen)
+  ├─ /period-info (PeriodInfoScreen)
+  ├─ /fees (FeesScreen)
+  ├─ /scores/general (GeneralScoresScreen)
+  └─ /debug (DebugScreen)
+```
+
+### Auth Guard Redirect Logic
+
+| Auth State              | On /login              | On /account-switcher | Elsewhere           |
+|-------------------------|------------------------|----------------------|---------------------|
+| AuthInitial/AuthLoading | no redirect            | no redirect          | no redirect         |
+| AuthUnauthenticated     | stay                   | → /login             | → /login            |
+| NeedsAccountSelection   | stay                   | stay                 | → /account-switcher |
+| AuthAuthenticated       | → / (unless addAccount)| → /                  | stay                |
+
+---
+
 ## Authentication Flow
 
 1. User enters Student ID + password on login screen
@@ -202,7 +252,16 @@ uit-mobile/
 4. Tokens stored encrypted via `flutter_secure_storage`
 5. On app startup, `AuthNotifier` auto-restores last session
 6. `JwtInterceptor` adds `Authorization: UitAu {base64("3sn@fah.{token}:")}` header to all requests
-7. If 401 received, intercept refreshes token and retries request
+7. If 401 received, interceptor re-authenticates using stored credentials, retries request, processes queued requests
+
+### Auth States (Sealed Class)
+
+- `AuthInitial` - First build, before restore
+- `AuthLoading` - Processing login/switch/logout
+- `AuthAuthenticated(session)` - Active user
+- `AuthUnauthenticated` - No session, no saved sessions
+- `AuthNeedsAccountSelection` - Multiple saved sessions, no active
+- `AuthError(message)` - Error occurred
 
 ---
 
@@ -211,25 +270,159 @@ uit-mobile/
 ### API → Storage → UI
 
 1. **API Service** (`lib/core/network/api_service.dart`) wraps UIT endpoints:
+   - `POST /v2/stc/generate` → Token generation
    - `GET /v2/data?task=current` → UserInfo
-   - `GET /v2/data?task=all&v=1` → StudentData (full data: courses, scores, fees, notifications, deadlines)
+   - `GET /v2/data?task=all&v=1` → StudentData (full data: courses, scores, fees, notifications, deadlines, exams)
 
 2. **Data Providers** (`lib/features/home/providers/data_providers.dart`):
-   - `studentDataProvider` - AsyncNotifier, cache-first strategy, auto-refresh in background
-   - `userInfoProvider` - AsyncNotifier, invalidates itself on profile changes
-   - Derived providers: `coursesProvider`, `scoresProvider`, `feesProvider`, etc.
+   - `studentDataProvider` - AsyncNotifier, cache-first strategy, auto-refresh in background, watches authProvider
+   - `userInfoProvider` - FutureProvider, separate endpoint for profile, cache-first with background refresh
+   - **Derived FutureProviders** (from studentDataProvider):
+     - `coursesProvider` → `List<Semester>`
+     - `scoresProvider` → `List<ScoreSemester>`
+     - `feesProvider` → `List<Fee>`
+     - `notificationsProvider` → `List<UitNotification>`
+     - `deadlinesProvider` → `List<Deadline>`
+     - `examsProvider` → `List<Exam>`
 
 3. **Hive Cache** (`lib/core/storage/hive_cache_service.dart`):
    - Stores JSON serialized models in boxes keyed by account ID
+   - Boxes: `courses`, `scores`, `notifications`, `deadlines`, `userInfo`, `exams`, `fees`
    - Offline-first: reads cache first, refreshes in background if stale
 
 4. **UI Screens** consume providers and rebuild reactively
 
-### Home Screen Widgets
+### Feature-Specific Providers
+
+- `deadlineFilterProvider` (NotifierProvider) - Filter: all/pending/finished/overdue
+- `filteredDeadlinesProvider` (FutureProvider) - Filtered deadline list
+- `examSortOrderProvider` (NotifierProvider) - Sort: asc/desc
+- `sortedExamsProvider` (FutureProvider) - Sorted exam list
+- `notificationSearchProvider` (NotifierProvider) - Search query string
+- `filteredNotificationsProvider` (FutureProvider) - Filtered notification list
+
+### Home Screen Widgets (Native)
 
 - **Android**: Kotlin `TimetableWidgetProvider`, `DeadlinesWidgetProvider` read from `SharedPreferences` (app group)
 - **iOS**: SwiftUI widgets read from `UserDefaults` (app group: `group.com.kevinnitro.uitMobile`)
 - **Dart Side**: `HomeWidgetService` serializes today's courses + upcoming deadlines → widgets
+- **Data Keys**: `today_courses`, `upcoming_deadlines`, `last_updated`
+
+---
+
+## Screen Implementations
+
+### Home Screen (`lib/features/home/presentation/home_screen.dart`)
+
+- **App Bar**: Refresh, Notifications (→ /notifications), Settings (→ /settings)
+- **Profile Card**: Avatar (first letter), name, student ID, major, class, email, DOB
+- **Overview Section**: Course count (total across all days), Deadline count as `remaining/total` (where remaining = total - submitted)
+- **Tuition Fees Section**: Summary card showing remaining amount, progress bar, paid/due totals; tappable to navigate to /fees
+
+### Timetable Screen (`lib/features/timetable/presentation/timetable_screen.dart`)
+
+- **TabBar**: 7 days (Mon-Sun), bold if has classes, outline color if no classes
+- **Today Indicator**: Current day tab has a **circled border** (primary color, rounded rectangle)
+- **Day Mapping**: Dart weekday (1=Mon) → UIT code (+1); initial tab = today
+- **Course Tiles**: Period badge (primaryContainer), class code, room, lecturer name
+- **App Bar Action**: Period Info button (→ /period-info)
+
+### Period Info Screen (`lib/features/timetable/presentation/period_info_screen.dart`)
+
+- **Static Data**: 10 UIT periods with numeric start/end hour+minute for time comparison
+- **Morning (1-5)**: Blue/primaryContainer colored
+- **Afternoon (6-10)**: Teal/tertiaryContainer colored
+- **Current Period Highlight**: If current time falls within a period's range, that card gets a **colored border** (primary for morning, tertiary for afternoon)
+
+### Deadlines Screen (`lib/features/deadlines/presentation/deadlines_screen.dart`)
+
+- **Filter Chips**: All, Pending, Finished, Overdue
+- **Status Icons**: check_circle (green/submitted), assignment_late (red/overdue), assignment (orange/pending)
+- **Additional Badges**: "Closed" if submission closed
+
+### Exams Screen (`lib/features/exams/presentation/exams_screen.dart`)
+
+- **Sort Toggle**: Ascending (oldest first) / Descending (newest first, default)
+- **Date-Based Card Coloring** (like period info screen):
+  - **Past exams**: primaryContainer background (blue tint)
+  - **Current (today)**: tertiaryContainer background + **colored border** (tertiary)
+  - **Future exams**: tertiaryContainer background (teal tint)
+- **Date Parsing**: Supports dd/MM/yyyy, dd-MM-yyyy, yyyy-MM-dd formats
+
+### Scores Screen (`lib/features/scores/presentation/scores_screen.dart`)
+
+- **Overall GPA Card**: Color-coded (green >=8.5, teal >=7.0, orange >=5.5, red <5.5), total credits
+- **Semester Cards** (most recent first): Expandable, per-semester GPA, subject count
+  - Each subject expandable: final grade badge, code, credits, type
+  - Component breakdown table: QT, TH, GK, CK (only non-zero weights)
+  - "Miễn" label for exempted courses
+
+### General Scores Screen (`lib/features/scores/presentation/general_scores_screen.dart`)
+
+- **Tabular View**: One semester per card
+- **Columns**: MAMH (code), LOP (class), TC (credits), QT, TH, GK, CK, TB (final)
+- **Features**: Alternating row colors, color-coded final grade chips
+
+### Fees Screen (`lib/features/fees/presentation/fees_screen.dart`)
+
+- **Summary Card**: Total due, total paid, remaining (green if paid, red if not), check mark if fully paid
+- **Per-Fee Cards**: Semester label, paid/unpaid badge, three amount columns, progress bar
+- **Registered Subjects**: Tags parsed from dkhp (code + credits)
+- **Currency**: VND formatted with thousands separator
+
+### Notifications Screen (`lib/features/notifications/presentation/notifications_screen.dart`)
+
+- **Search**: Toggle search bar, filters by title or content (case-insensitive)
+- **Tiles**: Expandable, title (truncate 2 lines collapsed), date, full content on expand
+- **Pull-to-Refresh**: Available
+
+### Settings Screen (`lib/features/settings/presentation/settings_screen.dart`)
+
+- **Language**: Radio buttons (Vietnamese/English)
+- **Account**: Manage accounts (→ /accounts), Logout with confirmation
+- **About**: App version (v1.0.1), Author, GitHub link (external), Debug screen (→ /debug)
+
+### Debug Screen (`lib/features/settings/presentation/debug_screen.dart`)
+
+- **Raw JSON Viewer**: Expandable sections for Courses, Scores, Fees, Notifications, Deadlines, Exams
+- **Copy Buttons**: Per-section and copy-all in app bar
+
+---
+
+## Data Models
+
+### UserSession
+- `studentId`, `encodedCredentials`, `token`, `encodedToken`, `tokenExpiry`, `name`, `avatarHash`
+
+### UserInfo
+- `name`, `sid`, `mail`, `status`, `course`, `major`, `dob`, `role`, `className`, `address`, `avatar`
+
+### Course + Semester
+- Course: `id`, `classCode`, `room`, `lecturerName`, `lecturerEmail`, `department`, `dayOfWeek`, `periods`
+- Semester: `name` (UIT day code '2'-'8'), `courses` (list)
+
+### Score + ScoreSemester
+- Score: `subjectCode`, `classCode`, `semester`, `year`, `credits`, `subjectName`, `subjectType`, `finalGrade`, `grade1-4`, `weight1-4`
+- Getters: `isExempted` (all weights=0), `countsForGpa` (not exempted, numeric grade, credits>0)
+
+### Exam
+- `classCode`, `details` (raw key-value), `dateKey`
+- Getters: `date`, `room` (regex), `time` (regex), `subjectName` (regex), `subjectCode` (regex)
+- Static: `listFromJson(Map)` parses flat API structure
+
+### Fee
+- `amountDue`, `amountPaid`, `semester`, `year`, `dkhp`
+- Getter: `subjects` (parsed from dkhp into code+credits pairs)
+
+### Deadline
+- `shortname`, `name`, `niceDate`, `status` (pending/overdue/submitted), `closed`
+- Status mapping: null→pending, "new"→overdue, "submitted"→submitted
+
+### UitNotification
+- `id`, `title`, `content`, `dated`
+
+### StudentData (raw wrapper)
+- `coursesRaw`, `scoresRaw`, `feeRaw`, `notifyRaw`, `deadlineRaw`, `examsRaw`
 
 ---
 
@@ -262,6 +455,7 @@ base64("3sn@fah.{jwtToken}:")
 - `magv` field (lecturer data) is a `List<Map>`, not a String
 - `courses[].name` and `scores[].name` can be returned as `int` or `String`
 - Exempted courses (`"Miễn"`) have `diem: "0"` and all weights = `"0"` in API
+- Exams returned as flat `Map<date, Map<slot, description>>` — parsed via regex
 
 ---
 
@@ -295,14 +489,15 @@ All UI strings are in `assets/translations/{en,vi}.json`:
   "login": { "signIn": "Sign In" / "Đăng nhập" },
   "home": { "overview": "Overview" / "Tổng quan" },
   "timetable": { "periodInfo": "Period Info" / "Chi tiết tiết học" },
+  "exams": { "sortAsc": "Sort oldest first", "sortDesc": "Sort newest first" },
   "scores": {
-    "component1": "QT (Process)" / "QT (Quá trình)",
-    "component2": "TH (Practice)" / "TH (Thực hành)",
-    "component3": "GK (Midterm)" / "GK (Giữa kỳ)",
-    "component4": "CK (Final)" / "CK (Cuối kỳ)",
-    "exempted": "Exempted — not counted in GPA" / "Miễn — không tính vào GPA"
+    "component1": "QT",
+    "component2": "TH",
+    "component3": "GK",
+    "component4": "CK",
+    "exempted": "Exempted" / "Miễn"
   },
-  // ... more keys
+  "fees": { "title": "Tuition Fees" / "Học phí", "paidInFull": "Paid in full" / "Đã đóng đủ" }
 }
 ```
 

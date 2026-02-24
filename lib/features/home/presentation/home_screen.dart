@@ -67,6 +67,13 @@ class HomeScreen extends ConsumerWidget {
               _SectionHeader(title: 'home.overview'.tr()),
               const SizedBox(height: 8),
               _QuickStats(ref: ref, theme: theme),
+
+              const SizedBox(height: 24),
+
+              // Tuition fees section
+              _SectionHeader(title: 'fees.title'.tr()),
+              const SizedBox(height: 8),
+              _FeesSection(ref: ref, theme: theme),
             ],
           ),
         ),
@@ -223,7 +230,14 @@ class _QuickStats extends StatelessWidget {
             value: deadlinesAsync.when(
               loading: () => '...',
               error: (_, _) => '-',
-              data: (d) => '${d.length}',
+              data: (deadlines) {
+                final total = deadlines.length;
+                final submitted = deadlines
+                    .where((d) => d.status == DeadlineStatus.submitted)
+                    .length;
+                final remaining = total - submitted;
+                return '$remaining/$total';
+              },
             ),
             theme: theme,
           ),
@@ -271,6 +285,166 @@ class _StatCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Format a number as VND currency.
+String _formatCurrency(double amount) {
+  final formatter = NumberFormat('#,###', 'vi');
+  return '${formatter.format(amount.round())} VND';
+}
+
+/// Tuition fees summary section on the home screen.
+class _FeesSection extends StatelessWidget {
+  final WidgetRef ref;
+  final ThemeData theme;
+
+  const _FeesSection({required this.ref, required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    final feesAsync = ref.watch(feesProvider);
+
+    return feesAsync.when(
+      loading: () => const Card(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (_, _) => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            '-',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.outline,
+            ),
+          ),
+        ),
+      ),
+      data: (fees) {
+        if (fees.isEmpty) {
+          return Card(
+            child: ListTile(
+              leading: Icon(
+                Icons.receipt_long_outlined,
+                color: theme.colorScheme.outline,
+              ),
+              title: Text(
+                'fees.noFees'.tr(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.outline,
+                ),
+              ),
+            ),
+          );
+        }
+
+        final totalDue = fees.fold<double>(
+          0,
+          (sum, f) => sum + (double.tryParse(f.amountDue) ?? 0),
+        );
+        final totalPaid = fees.fold<double>(
+          0,
+          (sum, f) => sum + (double.tryParse(f.amountPaid) ?? 0),
+        );
+        final totalRemaining = totalDue - totalPaid;
+        final isPaidInFull = totalRemaining <= 0;
+
+        return InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => context.push('/fees'),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        isPaidInFull
+                            ? Icons.check_circle_outline
+                            : Icons.receipt_long_outlined,
+                        color: isPaidInFull
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.error,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'fees.remaining'.tr(),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.outline,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isPaidInFull
+                                  ? 'fees.paidInFull'.tr()
+                                  : _formatCurrency(totalRemaining),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: isPaidInFull
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.error,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right,
+                        color: theme.colorScheme.outline,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: totalDue > 0
+                          ? (totalPaid / totalDue).clamp(0.0, 1.0)
+                          : 0,
+                      minHeight: 6,
+                      backgroundColor:
+                          theme.colorScheme.surfaceContainerHighest,
+                      valueColor: AlwaysStoppedAnimation(
+                        isPaidInFull
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${'fees.totalPaid'.tr()}: ${_formatCurrency(totalPaid)}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.outline,
+                        ),
+                      ),
+                      Text(
+                        '${'fees.totalDue'.tr()}: ${_formatCurrency(totalDue)}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.outline,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

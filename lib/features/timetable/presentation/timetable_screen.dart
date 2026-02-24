@@ -126,30 +126,16 @@ class _DayTabViewState extends State<_DayTabView>
                 widget.dayMap[day]!.isNotEmpty;
             final isToday = day == todayUitDay;
             return Tab(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _dayLabelKeys[day]?.tr() ?? day,
-                    style: TextStyle(
-                      fontWeight: hasClasses
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                      color: hasClasses ? null : theme.colorScheme.outline,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isToday
-                          ? theme.colorScheme.primary
-                          : Colors.transparent,
-                    ),
-                  ),
-                ],
+              child: Text(
+                _dayLabelKeys[day]?.tr() ?? day,
+                style: TextStyle(
+                  fontWeight: hasClasses ? FontWeight.bold : FontWeight.normal,
+                  color: isToday
+                      ? theme.colorScheme.tertiary
+                      : hasClasses
+                      ? null
+                      : theme.colorScheme.outline,
+                ),
               ),
             );
           }).toList(),

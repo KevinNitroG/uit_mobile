@@ -99,7 +99,9 @@
     "date": "Ngày thi",
     "time": "Giờ thi",
     "room": "Phòng thi",
-    "subjectCode": "Mã môn"
+    "subjectCode": "Mã môn",
+    "sortAsc": "Sắp xếp cũ nhất",
+    "sortDesc": "Sắp xếp mới nhất"
   },
   "settings": {
     "title": "Cài đặt",
@@ -113,7 +115,13 @@
     "debug": "Gỡ lỗi",
     "debugSubtitle": "Xem dữ liệu API thô",
     "debugCopy": "Sao chép toàn bộ JSON",
-    "debugCopied": "Đã sao chép JSON"
+    "debugCopied": "Đã sao chép JSON",
+    "updateAvailableTitle": "Có bản cập nhật mới",
+    "updateAvailableMessage": "Phiên bản mới {} đã có. Bạn có muốn tải về không?",
+    "updateDownload": "Tải về",
+    "updateLater": "Để sau",
+    "checkForUpdates": "Kiểm tra cập nhật",
+    "upToDate": "Ứng dụng đã là phiên bản mới nhất"
   },
   "common": {
     "retry": "Thử lại",

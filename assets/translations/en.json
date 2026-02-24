@@ -99,7 +99,9 @@
     "date": "Date",
     "time": "Time",
     "room": "Room",
-    "subjectCode": "Code"
+    "subjectCode": "Code",
+    "sortAsc": "Sort oldest first",
+    "sortDesc": "Sort newest first"
   },
   "settings": {
     "title": "Settings",
@@ -113,7 +115,13 @@
     "debug": "Debug",
     "debugSubtitle": "View raw API data",
     "debugCopy": "Copy all JSON",
-    "debugCopied": "JSON copied to clipboard"
+    "debugCopied": "JSON copied to clipboard",
+    "updateAvailableTitle": "Update Available",
+    "updateAvailableMessage": "A new version {} is available. Would you like to download it?",
+    "updateDownload": "Download",
+    "updateLater": "Later",
+    "checkForUpdates": "Check for Updates",
+    "upToDate": "App is up to date"
   },
   "common": {
     "retry": "Retry",

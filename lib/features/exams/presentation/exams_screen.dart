@@ -54,6 +54,21 @@ DateTime? _parseExamDate(String? dateStr) {
   return DateTime.tryParse(dateStr);
 }
 
+/// Temporal category for an exam relative to today.
+enum _ExamTimeCategory { past, current, future }
+
+/// Determine whether an exam is past, current (today), or future.
+_ExamTimeCategory _examTimeCategory(Exam exam) {
+  final examDate = _parseExamDate(exam.date);
+  if (examDate == null) return _ExamTimeCategory.future;
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final examDay = DateTime(examDate.year, examDate.month, examDate.day);
+  if (examDay.isBefore(today)) return _ExamTimeCategory.past;
+  if (examDay.isAtSameMomentAs(today)) return _ExamTimeCategory.current;
+  return _ExamTimeCategory.future;
+}
+
 /// Displays the exam schedule fetched from the student data API.
 class ExamsScreen extends ConsumerWidget {
   const ExamsScreen({super.key});
@@ -139,6 +154,22 @@ class _ExamCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final category = _examTimeCategory(exam);
+
+    // Determine card colors and border based on temporal category.
+    final Color cardColor;
+    final Color? borderColor;
+    switch (category) {
+      case _ExamTimeCategory.past:
+        cardColor = theme.colorScheme.primaryContainer.withValues(alpha: 0.3);
+        borderColor = null;
+      case _ExamTimeCategory.current:
+        cardColor = theme.colorScheme.tertiaryContainer.withValues(alpha: 0.3);
+        borderColor = theme.colorScheme.tertiary;
+      case _ExamTimeCategory.future:
+        cardColor = theme.colorScheme.tertiaryContainer.withValues(alpha: 0.3);
+        borderColor = null;
+    }
 
     // Build the date/time/room info chips.
     final infoParts = <String>[
@@ -149,6 +180,13 @@ class _ExamCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
+      color: cardColor,
+      shape: borderColor != null
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: borderColor, width: 2),
+            )
+          : null,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Column(
