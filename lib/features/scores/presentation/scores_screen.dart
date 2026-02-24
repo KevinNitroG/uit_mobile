@@ -4,8 +4,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
+/// Score classification thresholds (Vietnamese grading system).
+/// - Gioi (Excellent): 8.5 - 10
+/// - Kha (Good): 7.0 - 8.4
+/// - Trung binh (Average): 5.5 - 6.9
+/// - Yeu/Kem (Weak/Poor): < 5.5
+
+/// Returns the foreground color for a numeric grade.
+Color _scoreColor(ThemeData theme, double? grade) {
+  if (grade == null || grade < 0) return theme.colorScheme.outline;
+  if (grade >= 8.5) return theme.colorScheme.primary; // Gioi
+  if (grade >= 7.0) return theme.colorScheme.secondary; // Kha
+  if (grade >= 5.5) return theme.colorScheme.tertiary; // Trung binh
+  return theme.colorScheme.error; // Yeu/Kem
+}
+
+/// Returns a background color (low opacity) for a numeric grade.
+Color _scoreColorBg(ThemeData theme, double? grade) {
+  return _scoreColor(theme, grade).withValues(alpha: 0.12);
+}
+
 /// Calculate credit-weighted GPA for a list of scores.
-/// Excludes exempted courses (all weights=0, e.g. "Miễn") and courses with
+/// Excludes exempted courses (all weights=0, e.g. "Mien") and courses with
 /// non-numeric grades. Returns (gpa, totalCredits) or null if no valid scores.
 ({double gpa, int totalCredits})? _calculateGpa(List<Score> scores) {
   double weightedSum = 0;
@@ -120,7 +140,7 @@ class _OverallGpaCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: _gpaColor(theme, gpaResult?.gpa),
+                color: _scoreColor(theme, gpaResult?.gpa),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -135,13 +155,6 @@ class _OverallGpaCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _gpaColor(ThemeData theme, double? gpa) {
-    if (gpa == null) return theme.colorScheme.outline;
-    if (gpa >= 8.0) return theme.colorScheme.primary;
-    if (gpa >= 5.0) return theme.colorScheme.secondary;
-    return theme.colorScheme.error;
   }
 }
 
@@ -185,14 +198,14 @@ class _SemesterScoreCard extends StatelessWidget {
                     vertical: 1,
                   ),
                   decoration: BoxDecoration(
-                    color: _gradeColorBg(theme, semGpa.gpa),
+                    color: _scoreColorBg(theme, semGpa.gpa),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     '${semGpa.gpa.toStringAsFixed(2)} · ${semGpa.totalCredits} tc',
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: _gradeColorFg(theme, semGpa.gpa),
+                      color: _scoreColor(theme, semGpa.gpa),
                     ),
                   ),
                 ),
@@ -206,18 +219,6 @@ class _SemesterScoreCard extends StatelessWidget {
       ),
     );
   }
-
-  Color _gradeColorBg(ThemeData theme, double gpa) {
-    if (gpa >= 8.0) return theme.colorScheme.primary.withValues(alpha: 0.12);
-    if (gpa >= 5.0) return theme.colorScheme.secondary.withValues(alpha: 0.12);
-    return theme.colorScheme.error.withValues(alpha: 0.12);
-  }
-
-  Color _gradeColorFg(ThemeData theme, double gpa) {
-    if (gpa >= 8.0) return theme.colorScheme.primary;
-    if (gpa >= 5.0) return theme.colorScheme.secondary;
-    return theme.colorScheme.error;
-  }
 }
 
 /// Each subject is an expandable tile: summary row on top, detail table below.
@@ -226,19 +227,12 @@ class _ScoreDetailTile extends StatelessWidget {
 
   const _ScoreDetailTile({required this.score});
 
-  Color _gradeColor(ThemeData theme, String? grade) {
-    final g = double.tryParse(grade ?? '') ?? -1;
-    if (g < 0) return theme.colorScheme.outline;
-    if (g >= 8.0) return theme.colorScheme.primary;
-    if (g >= 5.0) return theme.colorScheme.secondary;
-    return theme.colorScheme.error;
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isExempted = score.isExempted;
-    final displayGrade = isExempted ? 'Miễn' : (score.finalGrade ?? '-');
+    final displayGrade = isExempted ? 'Mien' : (score.finalGrade ?? '-');
+    final gradeNum = double.tryParse(score.finalGrade ?? '');
 
     return Theme(
       data: Theme.of(
@@ -254,7 +248,7 @@ class _ScoreDetailTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: isExempted
                 ? theme.colorScheme.tertiary.withValues(alpha: 0.12)
-                : _gradeColor(theme, score.finalGrade).withValues(alpha: 0.12),
+                : _scoreColorBg(theme, gradeNum),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
@@ -264,7 +258,7 @@ class _ScoreDetailTile extends StatelessWidget {
               fontSize: isExempted ? 10 : null,
               color: isExempted
                   ? theme.colorScheme.tertiary
-                  : _gradeColor(theme, score.finalGrade),
+                  : _scoreColor(theme, gradeNum),
             ),
           ),
         ),
@@ -387,7 +381,10 @@ class _ScoreTable extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: _gradeColor(score.finalGrade),
+                      color: _scoreColor(
+                        theme,
+                        double.tryParse(score.finalGrade ?? ''),
+                      ),
                     ),
                   ),
                 ),
@@ -434,7 +431,10 @@ class _ScoreTable extends StatelessWidget {
               row.grade,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: _gradeColor(row.grade == '-' ? null : row.grade),
+                color: _scoreColor(
+                  theme,
+                  double.tryParse(row.grade == '-' ? '' : row.grade),
+                ),
               ),
             ),
           ),
@@ -451,14 +451,6 @@ class _ScoreTable extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Color _gradeColor(String? grade) {
-    final g = double.tryParse(grade ?? '') ?? -1;
-    if (g < 0) return theme.colorScheme.outline;
-    if (g >= 8.0) return theme.colorScheme.primary;
-    if (g >= 5.0) return theme.colorScheme.secondary;
-    return theme.colorScheme.error;
   }
 }
 

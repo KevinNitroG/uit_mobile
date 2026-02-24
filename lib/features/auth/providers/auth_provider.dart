@@ -70,12 +70,16 @@ class AuthNotifier extends Notifier<AuthState> {
     return const AuthLoading();
   }
 
-  /// Checks for an existing session on app start.
+  /// Checks for an existing session on app start and proactively refreshes
+  /// the token to ensure it's valid.
   Future<void> _restoreSession() async {
     try {
       final session = await _storage.getActiveSession();
       if (session != null && session.token != null) {
-        state = AuthAuthenticated(session);
+        // Proactively refresh the token on every app entry so we always start
+        // with a fresh token rather than waiting for a 401.
+        final refreshed = await _refreshToken(session);
+        state = AuthAuthenticated(refreshed ?? session);
       } else {
         // No active session — check if there are saved sessions the user can pick.
         final sessions = await _storage.getSessions();
@@ -86,7 +90,35 @@ class AuthNotifier extends Notifier<AuthState> {
         }
       }
     } catch (e) {
+      // If refresh fails, try using the existing session anyway. The JWT
+      // interceptor can still handle 401s as a fallback.
+      try {
+        final session = await _storage.getActiveSession();
+        if (session != null && session.token != null) {
+          state = AuthAuthenticated(session);
+          return;
+        }
+      } catch (_) {}
       state = const AuthUnauthenticated();
+    }
+  }
+
+  /// Attempts to refresh the token using stored credentials.
+  /// Returns the updated session, or null if the refresh fails.
+  Future<UserSession?> _refreshToken(UserSession session) async {
+    try {
+      final result = await _api.generateToken(session.encodedCredentials);
+      final encodedTok = encodeToken(result.token);
+      final updated = session.copyWith(
+        token: result.token,
+        encodedToken: encodedTok,
+        tokenExpiry: result.expires,
+      );
+      await _storage.upsertSession(updated);
+      return updated;
+    } catch (_) {
+      // Token refresh failed — caller decides what to do.
+      return null;
     }
   }
 
@@ -152,7 +184,9 @@ class AuthNotifier extends Notifier<AuthState> {
       await _clearCache();
 
       if (session != null) {
-        state = AuthAuthenticated(session);
+        // Proactively refresh token on account switch too.
+        final refreshed = await _refreshToken(session);
+        state = AuthAuthenticated(refreshed ?? session);
       } else {
         state = const AuthUnauthenticated();
       }

@@ -62,7 +62,8 @@
     "filterOverdue": "Overdue",
     "submitted": "Submitted",
     "pending": "Pending",
-    "overdue": "Overdue"
+    "overdue": "Overdue",
+    "closed": "Closed"
   },
   "scores": {
     "title": "Scores",
@@ -103,11 +104,31 @@
     "logoutTitle": "Logout",
     "logoutConfirm": "Are you sure you want to logout?",
     "author": "Author",
-    "sourceCode": "Source Code"
+    "sourceCode": "Source Code",
+    "debug": "Debug",
+    "debugSubtitle": "View raw API data",
+    "debugCopy": "Copy all JSON",
+    "debugCopied": "JSON copied to clipboard"
   },
   "common": {
     "retry": "Retry",
     "cancel": "Cancel",
     "remove": "Remove"
+  },
+  "fees": {
+    "title": "Tuition Fees",
+    "noFees": "No fee records found",
+    "summary": "Summary",
+    "totalDue": "Total Due",
+    "totalPaid": "Total Paid",
+    "remaining": "Remaining",
+    "paidInFull": "Paid in full",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "due": "Due",
+    "paidAmount": "Paid",
+    "remainingAmount": "Remaining",
+    "semesterLabel": "Semester {} - {}",
+    "registeredSubjects": "Registered Subjects"
   }
 }

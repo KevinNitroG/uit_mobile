@@ -63,6 +63,13 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
+                  leading: const Icon(Icons.receipt_long_outlined),
+                  title: Text('fees.title'.tr()),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/fees'),
+                ),
+                const Divider(height: 1),
+                ListTile(
                   leading: Icon(Icons.logout, color: theme.colorScheme.error),
                   title: Text(
                     'home.logout'.tr(),
@@ -123,6 +130,14 @@ class SettingsScreen extends ConsumerWidget {
                     Uri.parse('https://github.com/KevinNitroG/uit_mobile'),
                     mode: LaunchMode.externalApplication,
                   ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.bug_report_outlined),
+                  title: Text('settings.debug'.tr()),
+                  subtitle: Text('settings.debugSubtitle'.tr()),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/debug'),
                 ),
               ],
             ),

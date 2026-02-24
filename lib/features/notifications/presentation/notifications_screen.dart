@@ -126,10 +126,17 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   }
 }
 
-class _NotificationTile extends StatelessWidget {
+class _NotificationTile extends StatefulWidget {
   final UitNotification notification;
 
   const _NotificationTile({required this.notification});
+
+  @override
+  State<_NotificationTile> createState() => _NotificationTileState();
+}
+
+class _NotificationTileState extends State<_NotificationTile> {
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -142,24 +149,28 @@ class _NotificationTile extends StatelessWidget {
           color: theme.colorScheme.primary,
         ),
         title: Text(
-          notification.title,
+          widget.notification.title,
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.w600,
           ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
+          // When collapsed, truncate to 2 lines; when expanded, show full text.
+          maxLines: _isExpanded ? null : 2,
+          overflow: _isExpanded ? null : TextOverflow.ellipsis,
         ),
         subtitle: Text(
-          notification.dated,
+          widget.notification.dated,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.outline,
           ),
         ),
+        onExpansionChanged: (expanded) {
+          setState(() => _isExpanded = expanded);
+        },
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              notification.content,
+              widget.notification.content,
               style: theme.textTheme.bodyMedium,
             ),
           ),

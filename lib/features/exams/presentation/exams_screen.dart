@@ -4,16 +4,82 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
+/// Sort order for exams.
+enum ExamSortOrder { asc, desc }
+
+/// Current sort order state. Default: descending (newest first).
+final examSortOrderProvider =
+    NotifierProvider<_ExamSortOrderNotifier, ExamSortOrder>(
+      _ExamSortOrderNotifier.new,
+    );
+
+class _ExamSortOrderNotifier extends Notifier<ExamSortOrder> {
+  @override
+  ExamSortOrder build() => ExamSortOrder.desc;
+
+  void toggle() {
+    state = state == ExamSortOrder.asc ? ExamSortOrder.desc : ExamSortOrder.asc;
+  }
+}
+
+/// Sorted exams based on selected sort order.
+final sortedExamsProvider = FutureProvider<List<Exam>>((ref) async {
+  final exams = await ref.watch(examsProvider.future);
+  final sortOrder = ref.watch(examSortOrderProvider);
+
+  final sorted = List<Exam>.from(exams);
+  sorted.sort((a, b) {
+    final dateA = _parseExamDate(a.date);
+    final dateB = _parseExamDate(b.date);
+    if (dateA == null && dateB == null) return 0;
+    if (dateA == null) return 1;
+    if (dateB == null) return -1;
+    return sortOrder == ExamSortOrder.asc
+        ? dateA.compareTo(dateB)
+        : dateB.compareTo(dateA);
+  });
+  return sorted;
+});
+
+/// Try multiple date formats the API might return.
+DateTime? _parseExamDate(String? dateStr) {
+  if (dateStr == null || dateStr.isEmpty) return null;
+  // Common formats: "dd/MM/yyyy", "dd-MM-yyyy", "yyyy-MM-dd"
+  for (final fmt in ['dd/MM/yyyy', 'dd-MM-yyyy', 'yyyy-MM-dd']) {
+    try {
+      return DateFormat(fmt).parseStrict(dateStr);
+    } catch (_) {}
+  }
+  // Fallback: try standard parse
+  return DateTime.tryParse(dateStr);
+}
+
 /// Displays the exam schedule fetched from the student data API.
 class ExamsScreen extends ConsumerWidget {
   const ExamsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final examsAsync = ref.watch(examsProvider);
+    final examsAsync = ref.watch(sortedExamsProvider);
+    final sortOrder = ref.watch(examSortOrderProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text('exams.title'.tr())),
+      appBar: AppBar(
+        title: Text('exams.title'.tr()),
+        actions: [
+          IconButton(
+            icon: Icon(
+              sortOrder == ExamSortOrder.desc
+                  ? Icons.arrow_downward
+                  : Icons.arrow_upward,
+            ),
+            tooltip: sortOrder == ExamSortOrder.desc
+                ? 'exams.sortAsc'.tr()
+                : 'exams.sortDesc'.tr(),
+            onPressed: () => ref.read(examSortOrderProvider.notifier).toggle(),
+          ),
+        ],
+      ),
       body: examsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
@@ -74,17 +140,11 @@ class _ExamCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Collect extra fields the API may return beyond the known ones.
-    final knownKeys = {'phongthi', 'ngaythi', 'giobatdau', 'tenmh', 'mamh'};
-    final extraDetails = exam.details.entries
-        .where((e) => !knownKeys.contains(e.key))
-        .toList();
-
     // Build the date/time/room info chips.
     final infoParts = <String>[
       if (exam.date != null) exam.date!,
       if (exam.time != null) exam.time!,
-      if (exam.room != null) exam.room!,
+      if (exam.room != null) '${'exams.room'.tr()}: ${exam.room}',
     ];
 
     return Card(
@@ -118,17 +178,6 @@ class _ExamCard extends StatelessWidget {
               ],
             ),
 
-            // Class code (only if subject name is present, otherwise it's already the title)
-            if (exam.subjectName != null) ...[
-              const SizedBox(height: 2),
-              Text(
-                exam.classCode,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.outline,
-                ),
-              ),
-            ],
-
             // Date · Time · Room
             if (infoParts.isNotEmpty) ...[
               const SizedBox(height: 8),
@@ -137,17 +186,6 @@ class _ExamCard extends StatelessWidget {
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.secondary,
                   fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-
-            // Any extra fields the API may return (show values only)
-            for (final entry in extraDetails) ...[
-              const SizedBox(height: 4),
-              Text(
-                entry.value,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.outline,
                 ),
               ),
             ],

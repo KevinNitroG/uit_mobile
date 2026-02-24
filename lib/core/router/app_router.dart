@@ -5,7 +5,9 @@ import 'package:uit_mobile/features/auth/presentation/account_switcher_screen.da
 import 'package:uit_mobile/features/auth/presentation/accounts_screen.dart';
 import 'package:uit_mobile/features/auth/presentation/login_screen.dart';
 import 'package:uit_mobile/features/auth/providers/auth_provider.dart';
+import 'package:uit_mobile/features/fees/presentation/fees_screen.dart';
 import 'package:uit_mobile/features/notifications/presentation/notifications_screen.dart';
+import 'package:uit_mobile/features/settings/presentation/debug_screen.dart';
 import 'package:uit_mobile/features/settings/presentation/settings_screen.dart';
 import 'package:uit_mobile/features/timetable/presentation/period_info_screen.dart';
 import 'package:uit_mobile/shared/widgets/main_shell.dart';
@@ -99,6 +101,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'period-info',
             builder: (context, state) => const PeriodInfoScreen(),
+          ),
+          GoRoute(
+            path: 'fees',
+            builder: (context, state) => const FeesScreen(),
+          ),
+          GoRoute(
+            path: 'debug',
+            builder: (context, state) => const DebugScreen(),
           ),
         ],
       ),

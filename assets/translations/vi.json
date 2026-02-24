@@ -62,7 +62,8 @@
     "filterOverdue": "Quá hạn",
     "submitted": "Đã nộp",
     "pending": "Chưa nộp",
-    "overdue": "Quá hạn"
+    "overdue": "Quá hạn",
+    "closed": "Đã đóng"
   },
   "scores": {
     "title": "Điểm",
@@ -103,11 +104,31 @@
     "logoutTitle": "Đăng xuất",
     "logoutConfirm": "Bạn có chắc chắn muốn đăng xuất?",
     "author": "Tác giả",
-    "sourceCode": "Mã nguồn"
+    "sourceCode": "Mã nguồn",
+    "debug": "Gỡ lỗi",
+    "debugSubtitle": "Xem dữ liệu API thô",
+    "debugCopy": "Sao chép toàn bộ JSON",
+    "debugCopied": "Đã sao chép JSON"
   },
   "common": {
     "retry": "Thử lại",
     "cancel": "Hủy",
     "remove": "Xóa"
+  },
+  "fees": {
+    "title": "Học phí",
+    "noFees": "Không có dữ liệu học phí",
+    "summary": "Tổng quan",
+    "totalDue": "Tổng phải đóng",
+    "totalPaid": "Đã đóng",
+    "remaining": "Còn lại",
+    "paidInFull": "Đã đóng đủ",
+    "paid": "Đã đóng",
+    "unpaid": "Chưa đóng",
+    "due": "Phải đóng",
+    "paidAmount": "Đã đóng",
+    "remainingAmount": "Còn lại",
+    "semesterLabel": "Học kỳ {} - {}",
+    "registeredSubjects": "Môn đăng ký"
   }
 }

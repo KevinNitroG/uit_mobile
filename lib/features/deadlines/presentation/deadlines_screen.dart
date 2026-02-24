@@ -27,21 +27,14 @@ final filteredDeadlinesProvider = FutureProvider<List<Deadline>>((ref) async {
 
   return switch (filter) {
     DeadlineFilter.all => all,
-    DeadlineFilter.pending => all.where((d) => _isPending(d)).toList(),
-    DeadlineFilter.finished => all.where((d) => _isSubmitted(d)).toList(),
-    DeadlineFilter.overdue => all.where((d) => _isOverdue(d)).toList(),
+    DeadlineFilter.pending =>
+      all.where((d) => d.status == DeadlineStatus.pending).toList(),
+    DeadlineFilter.finished =>
+      all.where((d) => d.status == DeadlineStatus.submitted).toList(),
+    DeadlineFilter.overdue =>
+      all.where((d) => d.status == DeadlineStatus.overdue).toList(),
   };
 });
-
-/// API status mapping:
-///   null        → pending (chưa nộp, còn trong hạn)
-///   "new"       → overdue (chưa nộp, đã quá hạn)
-///   "submitted" → finished (đã nộp)
-bool _isPending(Deadline d) => d.status == null;
-
-bool _isSubmitted(Deadline d) => d.status == 'submitted';
-
-bool _isOverdue(Deadline d) => d.status == 'new';
 
 /// Displays upcoming deadlines/assignments with filter toggles.
 class DeadlinesScreen extends ConsumerWidget {
@@ -151,20 +144,27 @@ class _DeadlineTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isSubmitted = _isSubmitted(deadline);
-    final isOverdue = _isOverdue(deadline);
-    final isPending = _isPending(deadline);
 
-    final (IconData icon, Color color) = switch (true) {
-      _ when isSubmitted => (
+    final (
+      IconData icon,
+      Color color,
+      String badgeKey,
+    ) = switch (deadline.status) {
+      DeadlineStatus.submitted => (
         Icons.check_circle_rounded,
         theme.colorScheme.primary,
+        'deadlines.submitted',
       ),
-      _ when isOverdue => (
+      DeadlineStatus.overdue => (
         Icons.assignment_late_outlined,
         theme.colorScheme.error,
+        'deadlines.overdue',
       ),
-      _ => (Icons.assignment_outlined, theme.colorScheme.tertiary),
+      DeadlineStatus.pending => (
+        Icons.assignment_outlined,
+        theme.colorScheme.tertiary,
+        'deadlines.pending',
+      ),
     };
 
     return Card(
@@ -190,32 +190,22 @@ class _DeadlineTile extends StatelessWidget {
                   color: theme.colorScheme.secondary,
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  deadline.niceDate,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.secondary,
-                    fontWeight: FontWeight.w500,
+                Flexible(
+                  child: Text(
+                    deadline.niceDate,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.secondary,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-                if (isSubmitted) ...[
-                  const SizedBox(width: 8),
+                const SizedBox(width: 8),
+                _StatusBadge(label: badgeKey.tr(), color: color),
+                if (deadline.closed) ...[
+                  const SizedBox(width: 6),
                   _StatusBadge(
-                    label: 'deadlines.submitted'.tr(),
-                    color: theme.colorScheme.primary,
-                  ),
-                ],
-                if (isPending) ...[
-                  const SizedBox(width: 8),
-                  _StatusBadge(
-                    label: 'deadlines.pending'.tr(),
-                    color: theme.colorScheme.tertiary,
-                  ),
-                ],
-                if (isOverdue) ...[
-                  const SizedBox(width: 8),
-                  _StatusBadge(
-                    label: 'deadlines.overdue'.tr(),
-                    color: theme.colorScheme.error,
+                    label: 'deadlines.closed'.tr(),
+                    color: theme.colorScheme.outline,
                   ),
                 ],
               ],

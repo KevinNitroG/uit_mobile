@@ -62,9 +62,9 @@ class HomeWidgetService {
     List<Deadline> deadlines, {
     int max = 3,
   }) {
-    // Filter to only unsubmitted deadlines, take first N.
+    // Filter to only unsubmitted and not-closed deadlines (pending or overdue), take first N.
     final upcoming = deadlines
-        .where((d) => d.status == null || d.status!.isEmpty)
+        .where((d) => d.status != DeadlineStatus.submitted && !d.closed)
         .take(max)
         .toList();
 
