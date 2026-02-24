@@ -17,7 +17,12 @@ Trollstore quick link: [![Trollstore](https://img.shields.io/badge/trollstore-89
 
 ## Feature
 
-- [x] Tuition fees screen (in setting account screen)
+- [x] Cached data
+  > Load previous data when start and fetch in the same time I guess. can open app with no internet
+- [x] Auto refresh token on app start
+  > No more access token expired 30d and need to manually signin again
+- [x] Tuition fees screen
+  > in setting account screen
 - [x] GPA calculation
 - [-] System authentication
   - [x] Android
