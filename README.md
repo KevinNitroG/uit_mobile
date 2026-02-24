@@ -18,13 +18,22 @@ Trollstore quick link: [![Trollstore](https://img.shields.io/badge/trollstore-89
 ## Feature
 
 - [x] GPA calculation
-- [ ] Multiple accounts
+- [-] System authentication
+  - [x] Android
+    > `androidapp://com.kevinnitro.uit_mobile`
+  - [ ] iOS
+    > opus 4.6 couldn't implement this
+- [-] Multiple accounts
   > Opus 4.6 couldn't fix it
 - [ ] Roll call
   > No, couldn't capture that api
 - [ ] Avatar
-  > Couldn't capture the api
+  > Couldn't/Lazy to capture the api
+- [-] Widget
+  - [-] Android (Uglyyy)
+  - [ ] iOS (don't even work)
 
 ## Acknowledgement
 
 - [API](https://gist.github.com/KevinNitroG/c643b49b15a7ff53c3b0147fbe887030)
+  > Please do a better app with this API!
