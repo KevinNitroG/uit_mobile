@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uit_mobile/features/auth/providers/auth_provider.dart';
+import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
 /// Shown on startup when there are saved sessions but no active one.
@@ -56,10 +57,14 @@ class AccountSwitcherScreen extends ConsumerWidget {
                         (session) => _AccountCard(
                           session: session,
                           theme: theme,
-                          onTap: () {
-                            ref
+                          onTap: () async {
+                            await ref
                                 .read(authProvider.notifier)
                                 .switchAccount(session.studentId);
+                            ref
+                                .read(studentDataProvider.notifier)
+                                .forceRefresh();
+                            ref.invalidate(userInfoProvider);
                           },
                         ),
                       ),

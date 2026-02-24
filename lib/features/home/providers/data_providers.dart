@@ -13,9 +13,17 @@ final studentDataProvider =
     );
 
 class StudentDataNotifier extends AsyncNotifier<StudentData> {
-  /// Guards against stale background refreshes writing to [state] after the
-  /// provider has been invalidated / disposed (e.g. during account switch).
-  bool _disposed = false;
+  /// When true the next [build] skips the Hive cache and fetches from the
+  /// network directly.  Set by [forceRefresh] (called from the accounts screen
+  /// after switching accounts) so that stale data left behind by a concurrent
+  /// background refresh from the previous account is never served.
+  bool _skipCache = false;
+
+  /// Marks this provider so the next build bypasses cache.
+  void forceRefresh() {
+    _skipCache = true;
+    ref.invalidateSelf();
+  }
 
   /// Push data to native home screen widgets.
   Future<void> _updateHomeWidgets(StudentData data) async {
@@ -52,14 +60,24 @@ class StudentDataNotifier extends AsyncNotifier<StudentData> {
       );
     }
 
-    _disposed = false;
-    ref.onDispose(() => _disposed = true);
+    // Use a local variable captured by the background refresh closure so each
+    // invocation of build() has its own disposal flag. An instance field would
+    // be shared across rebuilds and could be reset to false by a newer build()
+    // before the old background task checks it, allowing stale data through.
+    var disposed = false;
+    ref.onDispose(() => disposed = true);
 
     final cache = ref.read(hiveCacheServiceProvider);
     final api = ref.read(uitApiServiceProvider);
 
-    // Try cache first.
-    final cachedCourses = cache.getCachedCourses();
+    // If a force-refresh was requested (e.g. after account switch), skip cache
+    // entirely to avoid serving stale data that a concurrent background refresh
+    // from the previous account may have written back.
+    final shouldSkipCache = _skipCache;
+    _skipCache = false; // reset for future builds
+
+    // Try cache first (unless bypassed).
+    final cachedCourses = shouldSkipCache ? null : cache.getCachedCourses();
     if (cachedCourses != null) {
       // Return cached immediately, then refresh in background.
       final cached = StudentData(
@@ -75,15 +93,21 @@ class StudentDataNotifier extends AsyncNotifier<StudentData> {
       _updateHomeWidgets(cached);
 
       // Fire-and-forget background refresh.
-      // Guard with [_disposed] to prevent a stale fetch (e.g. from a previous
-      // account) from overwriting fresh data after an account switch.
+      // Guard with [disposed] to prevent a stale fetch (e.g. from a previous
+      // account) from overwriting the cache or provider state after an account
+      // switch.  We intentionally skip the cache write entirely if the provider
+      // was invalidated to close the race window where _clearCache() runs
+      // between the disposed check and the cache.cacheStudentData() await.
       Future(() async {
         try {
           final fresh = await api.getStudentData();
-          if (_disposed) return; // Provider was invalidated; discard result.
-          await cache.cacheStudentData(fresh.toJson());
-          if (_disposed) return;
+          if (disposed) return; // Provider was invalidated; discard result.
           state = AsyncData(fresh);
+          // Only persist to cache if still valid — this is a best-effort
+          // optimisation for the next cold start.
+          if (!disposed) {
+            cache.cacheStudentData(fresh.toJson()); // fire-and-forget
+          }
           _updateHomeWidgets(fresh);
         } catch (_) {
           // Keep cached data if refresh fails.
@@ -199,9 +223,12 @@ final userInfoProvider = FutureProvider<UserInfo>((ref) async {
       try {
         final fresh = await api.getUserInfo();
         if (disposed) return; // Provider was invalidated; discard result.
-        await cache.cacheUserInfo(fresh.toJson());
-        if (disposed) return;
-        ref.invalidateSelf();
+        // Persist to cache only if still valid — fire-and-forget so the await
+        // gap doesn't create a race with _clearCache during account switch.
+        if (!disposed) {
+          cache.cacheUserInfo(fresh.toJson()); // fire-and-forget
+        }
+        if (!disposed) ref.invalidateSelf();
       } catch (_) {}
     });
     return UserInfo.fromJson(cached);

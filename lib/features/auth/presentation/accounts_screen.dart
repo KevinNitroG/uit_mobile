@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uit_mobile/features/auth/providers/auth_provider.dart';
+import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
 /// Screen for managing multiple accounts.
@@ -37,11 +38,18 @@ class AccountsScreen extends ConsumerWidget {
               return _AccountTile(
                 session: session,
                 isActive: isActive,
-                onSwitch: () {
-                  ref
+                onSwitch: () async {
+                  await ref
                       .read(authProvider.notifier)
                       .switchAccount(session.studentId);
-                  context.pop();
+                  // Force data providers to bypass cache and fetch fresh data
+                  // for the newly active account. This closes a race where a
+                  // background refresh from the previous account could write
+                  // stale data back into the cache between _clearCache() and
+                  // the new build().
+                  ref.read(studentDataProvider.notifier).forceRefresh();
+                  ref.invalidate(userInfoProvider);
+                  if (context.mounted) context.pop();
                 },
                 onRemove: () async {
                   final confirm = await showDialog<bool>(
@@ -64,9 +72,14 @@ class AccountsScreen extends ConsumerWidget {
                     ),
                   );
                   if (confirm == true) {
-                    ref
+                    await ref
                         .read(authProvider.notifier)
                         .removeAccount(session.studentId);
+                    // If the removed account was active, removeAccount
+                    // internally switches to another account — force a fresh
+                    // fetch to avoid stale cache.
+                    ref.read(studentDataProvider.notifier).forceRefresh();
+                    ref.invalidate(userInfoProvider);
                   }
                 },
               );

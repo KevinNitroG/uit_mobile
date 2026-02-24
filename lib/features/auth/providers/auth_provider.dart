@@ -139,16 +139,22 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   /// Switches to an existing session by [studentId].
+  ///
+  /// Deliberately avoids an intermediate [AuthLoading] state so that watchers
+  /// (e.g. [studentDataProvider]) only rebuild **once** — when the new
+  /// [AuthAuthenticated] state is emitted with a clean cache.  Setting
+  /// [AuthLoading] first would trigger an extra rebuild that returns empty data,
+  /// and the subsequent [AuthAuthenticated] rebuild may not re-trigger watchers
+  /// correctly depending on Riverpod's coalescing behaviour.
   Future<void> switchAccount(String studentId) async {
-    state = const AuthLoading();
     try {
+      // Prepare everything before emitting a new state so watchers see a single
+      // transition from the old AuthAuthenticated(A) → AuthAuthenticated(B).
       await _storage.setActiveSessionId(studentId);
       final session = await _storage.getActiveSession();
       ref.invalidate(sessionsProvider);
 
       // Clear cache so the data providers fetch fresh data for this account.
-      // Data providers watch authProvider, so they re-run automatically when
-      // state changes below.
       await _clearCache();
 
       if (session != null) {
@@ -163,11 +169,16 @@ class AuthNotifier extends Notifier<AuthState> {
 
   /// Removes a session and logs out if it was the active one.
   Future<void> removeAccount(String studentId) async {
+    // Read active ID before removing the session to avoid race conditions.
+    final activeId = await _storage.getActiveSessionId();
+
     await _storage.removeSession(studentId);
     ref.invalidate(sessionsProvider);
-    final activeId = await _storage.getActiveSessionId();
+
     if (activeId == studentId) {
       await _storage.clearActiveSession();
+      await _clearCache();
+
       final sessions = await _storage.getSessions();
       if (sessions.isNotEmpty) {
         await switchAccount(sessions.first.studentId);
@@ -177,11 +188,19 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
-  /// Logs out the current session (does not remove it from storage).
+  /// Logs out the current session and removes its credentials from storage.
   Future<void> logout() async {
+    // Remove the active session's credentials from persistent storage.
+    final activeId = await _storage.getActiveSessionId();
+    if (activeId != null) {
+      await _storage.removeSession(activeId);
+    }
     await _storage.clearActiveSession();
+
     // Clear cache to prevent stale data leaking across accounts.
     await _clearCache();
+
+    ref.invalidate(sessionsProvider);
 
     // Check if there are other saved sessions to show the account switcher.
     final sessions = await _storage.getSessions();
