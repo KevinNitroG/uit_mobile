@@ -1,12 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:uit_mobile/features/deadlines/presentation/deadlines_screen.dart';
+import 'package:uit_mobile/features/exams/presentation/exams_screen.dart';
 import 'package:uit_mobile/features/home/presentation/home_screen.dart';
 import 'package:uit_mobile/features/scores/presentation/scores_screen.dart';
 import 'package:uit_mobile/features/timetable/presentation/timetable_screen.dart';
 
 /// Main shell with bottom navigation for the authenticated app.
-/// 4 tabs: Home, TKB, Deadlines, Scores.
+/// 5 tabs: Home, TKB, Deadlines, Exams, Scores.
 /// Notifications and Settings are accessible from Home's app bar.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -22,6 +23,7 @@ class _MainShellState extends State<MainShell> {
     HomeScreen(),
     TimetableScreen(),
     DeadlinesScreen(),
+    ExamsScreen(),
     ScoresScreen(),
   ];
 
@@ -49,6 +51,11 @@ class _MainShellState extends State<MainShell> {
             icon: const Icon(Icons.assignment_outlined),
             selectedIcon: const Icon(Icons.assignment),
             label: 'nav.deadlines'.tr(),
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.event_outlined),
+            selectedIcon: const Icon(Icons.event),
+            label: 'nav.exams'.tr(),
           ),
           NavigationDestination(
             icon: const Icon(Icons.score_outlined),

@@ -12,7 +12,8 @@
     "timetable": "Timetable",
     "deadlines": "Deadlines",
     "scores": "Scores",
-    "notifications": "Alerts",
+    "exams": "Exams",
+    "notifications": "Notifications",
     "settings": "Settings"
   },
   "home": {
@@ -33,7 +34,9 @@
     "active": "Active",
     "switchTo": "Switch to this account",
     "removeTitle": "Remove Account",
-    "removeConfirm": "Remove account {}?"
+    "removeConfirm": "Remove account {}?",
+    "chooseAccount": "Choose an account",
+    "chooseAccountSubtitle": "Select an account to continue"
   },
   "timetable": {
     "title": "Timetable",
@@ -49,6 +52,7 @@
     "filterFinished": "Finished",
     "filterOverdue": "Overdue",
     "submitted": "Submitted",
+    "pending": "Pending",
     "overdue": "Overdue"
   },
   "scores": {
@@ -59,10 +63,10 @@
     "component": "Component",
     "grade": "Grade",
     "weight": "Weight",
-    "component1": "QT (Process)",
-    "component2": "TH (Practice)",
-    "component3": "GK (Midterm)",
-    "component4": "CK (Final)",
+    "component1": "QT",
+    "component2": "TH",
+    "component3": "GK",
+    "component4": "CK",
     "final": "Final",
     "semesterGpa": "Semester GPA",
     "overallGpa": "Overall GPA",
@@ -74,13 +78,23 @@
     "searchHint": "Search notifications...",
     "noNotifications": "No notifications"
   },
+  "exams": {
+    "title": "Exams",
+    "noExams": "No exam schedule found",
+    "date": "Date",
+    "time": "Time",
+    "room": "Room",
+    "subjectCode": "Code"
+  },
   "settings": {
     "title": "Settings",
     "language": "Language",
     "account": "Account",
     "about": "About",
     "logoutTitle": "Logout",
-    "logoutConfirm": "Are you sure you want to logout?"
+    "logoutConfirm": "Are you sure you want to logout?",
+    "author": "Author",
+    "sourceCode": "Source Code"
   },
   "common": {
     "retry": "Retry",

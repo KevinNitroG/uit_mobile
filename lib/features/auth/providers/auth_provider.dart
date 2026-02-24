@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uit_mobile/core/network/api_service.dart';
 import 'package:uit_mobile/core/storage/hive_cache_service.dart';
 import 'package:uit_mobile/core/storage/secure_storage_service.dart';
+import 'package:uit_mobile/core/utils/constants.dart';
 import 'package:uit_mobile/core/utils/encoding.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
@@ -27,6 +28,12 @@ class AuthAuthenticated extends AuthState {
 
 class AuthUnauthenticated extends AuthState {
   const AuthUnauthenticated();
+}
+
+/// There are saved sessions but no active one — the user should choose which
+/// account to use, or add a new one.
+class AuthNeedsAccountSelection extends AuthState {
+  const AuthNeedsAccountSelection();
 }
 
 class AuthError extends AuthState {
@@ -70,11 +77,28 @@ class AuthNotifier extends Notifier<AuthState> {
       if (session != null && session.token != null) {
         state = AuthAuthenticated(session);
       } else {
-        state = const AuthUnauthenticated();
+        // No active session — check if there are saved sessions the user can pick.
+        final sessions = await _storage.getSessions();
+        if (sessions.isNotEmpty) {
+          state = const AuthNeedsAccountSelection();
+        } else {
+          state = const AuthUnauthenticated();
+        }
       }
     } catch (e) {
       state = const AuthUnauthenticated();
     }
+  }
+
+  /// Clears all Hive cache boxes so the next fetch retrieves fresh data for the
+  /// newly active account.
+  Future<void> _clearCache() async {
+    await _cache.clearBox(HiveBoxes.courses);
+    await _cache.clearBox(HiveBoxes.scores);
+    await _cache.clearBox(HiveBoxes.notifications);
+    await _cache.clearBox(HiveBoxes.deadlines);
+    await _cache.clearBox(HiveBoxes.userInfo);
+    await _cache.clearBox(HiveBoxes.exams);
   }
 
   /// Logs in with [studentId] and [password].
@@ -100,9 +124,13 @@ class AuthNotifier extends Notifier<AuthState> {
       await _storage.upsertSession(session);
       await _storage.setActiveSessionId(studentId);
 
-      // Invalidate the sessions provider so the accounts screen reflects the
-      // newly added/updated session.
+      // Invalidate the sessions list so the accounts screen updates.
       ref.invalidate(sessionsProvider);
+
+      // Clear cache so the data providers fetch fresh data for this account.
+      // Data providers watch authProvider, so they re-run automatically when
+      // state changes to AuthAuthenticated below.
+      await _clearCache();
 
       state = AuthAuthenticated(session);
     } catch (e) {
@@ -117,6 +145,12 @@ class AuthNotifier extends Notifier<AuthState> {
       await _storage.setActiveSessionId(studentId);
       final session = await _storage.getActiveSession();
       ref.invalidate(sessionsProvider);
+
+      // Clear cache so the data providers fetch fresh data for this account.
+      // Data providers watch authProvider, so they re-run automatically when
+      // state changes below.
+      await _clearCache();
+
       if (session != null) {
         state = AuthAuthenticated(session);
       } else {
@@ -146,12 +180,15 @@ class AuthNotifier extends Notifier<AuthState> {
   /// Logs out the current session (does not remove it from storage).
   Future<void> logout() async {
     await _storage.clearActiveSession();
-    // Clear cached data to prevent stale data leaking across accounts.
-    await _cache.clearBox('courses');
-    await _cache.clearBox('scores');
-    await _cache.clearBox('notifications');
-    await _cache.clearBox('deadlines');
-    await _cache.clearBox('user_info');
-    state = const AuthUnauthenticated();
+    // Clear cache to prevent stale data leaking across accounts.
+    await _clearCache();
+
+    // Check if there are other saved sessions to show the account switcher.
+    final sessions = await _storage.getSessions();
+    if (sessions.isNotEmpty) {
+      state = const AuthNeedsAccountSelection();
+    } else {
+      state = const AuthUnauthenticated();
+    }
   }
 }

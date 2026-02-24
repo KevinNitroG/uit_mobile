@@ -20,6 +20,7 @@ class HiveCacheService {
       Hive.openBox<String>(HiveBoxes.notifications),
       Hive.openBox<String>(HiveBoxes.deadlines),
       Hive.openBox<String>(HiveBoxes.userInfo),
+      Hive.openBox<String>(HiveBoxes.exams),
     ]);
   }
 
@@ -56,6 +57,7 @@ class HiveCacheService {
     await put(HiveBoxes.scores, 'data', data['scores']);
     await put(HiveBoxes.notifications, 'data', data['notify']);
     await put(HiveBoxes.deadlines, 'data', data['deadline']);
+    await put(HiveBoxes.exams, 'data', data['exams']);
   }
 
   List<dynamic>? getCachedCourses() => get(HiveBoxes.courses, 'data') as List?;
@@ -67,6 +69,9 @@ class HiveCacheService {
 
   List<dynamic>? getCachedDeadlines() =>
       get(HiveBoxes.deadlines, 'data') as List?;
+
+  Map<String, dynamic>? getCachedExams() =>
+      get(HiveBoxes.exams, 'data') as Map<String, dynamic>?;
 
   Future<void> cacheUserInfo(Map<String, dynamic> data) async {
     await put(HiveBoxes.userInfo, 'data', data);

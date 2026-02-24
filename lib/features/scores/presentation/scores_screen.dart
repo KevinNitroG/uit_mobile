@@ -275,7 +275,7 @@ class _ScoreDetailTile extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          '${score.subjectCode} · ${score.credits} ${'scores.credits'.tr()}',
+          '${score.subjectCode} · ${score.credits} ${'scores.credits'.tr()}${score.subjectType.isNotEmpty ? ' · ${score.subjectType}' : ''}',
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.outline,
           ),

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uit_mobile/features/auth/providers/auth_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+const _kAppVersion = 'v0.1.0'; // x-release-please-version
 
 /// Settings screen with language switching and account management.
 class SettingsScreen extends ConsumerWidget {
@@ -97,10 +100,31 @@ class SettingsScreen extends ConsumerWidget {
           _SectionHeader(title: 'settings.about'.tr()),
           const SizedBox(height: 8),
           Card(
-            child: ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: const Text('UIT Mobile'),
-              subtitle: const Text('v0.1.0'), // x-release-please-version
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: const Text('UIT Mobile'),
+                  subtitle: const Text(_kAppVersion),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.person_outline),
+                  title: Text('settings.author'.tr()),
+                  subtitle: const Text('Kevin Nitro'),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.code),
+                  title: Text('settings.sourceCode'.tr()),
+                  subtitle: const Text('github.com/KevinNitroG/uit_mobile'),
+                  trailing: const Icon(Icons.open_in_new, size: 16),
+                  onTap: () => launchUrl(
+                    Uri.parse('https://github.com/KevinNitroG/uit_mobile'),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

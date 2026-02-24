@@ -8,8 +8,8 @@
         {
           "type": "generic",
           "path": "lib/features/settings/presentation/settings_screen.dart",
-          "search-by-regex": "subtitle: const Text\\('v\\d+\\.\\d+\\.\\d+'\\), // x-release-please-version",
-          "replace": "subtitle: const Text('v{{version}}'), // x-release-please-version"
+          "search-by-regex": "const _kAppVersion = 'v\\d+\\.\\d+\\.\\d+'; // x-release-please-version",
+          "replace": "const _kAppVersion = 'v{{version}}'; // x-release-please-version"
         }
       ],
       "changelog-sections": [

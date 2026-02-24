@@ -12,6 +12,7 @@
     "timetable": "TKB",
     "deadlines": "Deadline",
     "scores": "Điểm",
+    "exams": "Lịch thi",
     "notifications": "Thông báo",
     "settings": "Cài đặt"
   },
@@ -33,7 +34,9 @@
     "active": "Đang dùng",
     "switchTo": "Chuyển sang tài khoản này",
     "removeTitle": "Xóa tài khoản",
-    "removeConfirm": "Xóa tài khoản {}?"
+    "removeConfirm": "Xóa tài khoản {}?",
+    "chooseAccount": "Chọn tài khoản",
+    "chooseAccountSubtitle": "Chọn tài khoản để tiếp tục"
   },
   "timetable": {
     "title": "Thời khóa biểu",
@@ -49,6 +52,7 @@
     "filterFinished": "Đã nộp",
     "filterOverdue": "Quá hạn",
     "submitted": "Đã nộp",
+    "pending": "Chưa nộp",
     "overdue": "Quá hạn"
   },
   "scores": {
@@ -59,10 +63,10 @@
     "component": "Thành phần",
     "grade": "Điểm",
     "weight": "Trọng số",
-    "component1": "QT (Quá trình)",
-    "component2": "TH (Thực hành)",
-    "component3": "GK (Giữa kỳ)",
-    "component4": "CK (Cuối kỳ)",
+    "component1": "QT",
+    "component2": "TH",
+    "component3": "GK",
+    "component4": "CK",
     "final": "Tổng kết",
     "semesterGpa": "GPA học kỳ",
     "overallGpa": "GPA tích lũy",
@@ -74,13 +78,23 @@
     "searchHint": "Tìm kiếm thông báo...",
     "noNotifications": "Không có thông báo"
   },
+  "exams": {
+    "title": "Lịch thi",
+    "noExams": "Không có lịch thi",
+    "date": "Ngày thi",
+    "time": "Giờ thi",
+    "room": "Phòng thi",
+    "subjectCode": "Mã môn"
+  },
   "settings": {
     "title": "Cài đặt",
     "language": "Ngôn ngữ",
     "account": "Tài khoản",
     "about": "Thông tin",
     "logoutTitle": "Đăng xuất",
-    "logoutConfirm": "Bạn có chắc chắn muốn đăng xuất?"
+    "logoutConfirm": "Bạn có chắc chắn muốn đăng xuất?",
+    "author": "Tác giả",
+    "sourceCode": "Mã nguồn"
   },
   "common": {
     "retry": "Thử lại",

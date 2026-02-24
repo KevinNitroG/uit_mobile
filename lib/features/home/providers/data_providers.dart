@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uit_mobile/core/network/api_service.dart';
 import 'package:uit_mobile/core/storage/hive_cache_service.dart';
 import 'package:uit_mobile/core/storage/home_widget_service.dart';
+import 'package:uit_mobile/features/auth/providers/auth_provider.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
 /// Provider that fetches and caches the full student data.
@@ -12,6 +13,10 @@ final studentDataProvider =
     );
 
 class StudentDataNotifier extends AsyncNotifier<StudentData> {
+  /// Guards against stale background refreshes writing to [state] after the
+  /// provider has been invalidated / disposed (e.g. during account switch).
+  bool _disposed = false;
+
   /// Push data to native home screen widgets.
   Future<void> _updateHomeWidgets(StudentData data) async {
     try {
@@ -32,6 +37,24 @@ class StudentDataNotifier extends AsyncNotifier<StudentData> {
 
   @override
   Future<StudentData> build() async {
+    // Watch the auth state so this provider automatically re-runs whenever the
+    // active account changes (login, switchAccount, logout).
+    final authState = ref.watch(authProvider);
+    if (authState is! AuthAuthenticated) {
+      // Not logged in — return empty data rather than fetching.
+      return const StudentData(
+        coursesRaw: [],
+        scoresRaw: [],
+        feeRaw: [],
+        notifyRaw: [],
+        deadlineRaw: [],
+        examsRaw: {},
+      );
+    }
+
+    _disposed = false;
+    ref.onDispose(() => _disposed = true);
+
     final cache = ref.read(hiveCacheServiceProvider);
     final api = ref.read(uitApiServiceProvider);
 
@@ -45,17 +68,21 @@ class StudentDataNotifier extends AsyncNotifier<StudentData> {
         feeRaw: [],
         notifyRaw: cache.getCachedNotifications() ?? [],
         deadlineRaw: cache.getCachedDeadlines() ?? [],
-        examsRaw: {},
+        examsRaw: cache.getCachedExams() ?? {},
       );
 
       // Update widgets with cached data immediately.
       _updateHomeWidgets(cached);
 
       // Fire-and-forget background refresh.
+      // Guard with [_disposed] to prevent a stale fetch (e.g. from a previous
+      // account) from overwriting fresh data after an account switch.
       Future(() async {
         try {
           final fresh = await api.getStudentData();
+          if (_disposed) return; // Provider was invalidated; discard result.
           await cache.cacheStudentData(fresh.toJson());
+          if (_disposed) return;
           state = AsyncData(fresh);
           _updateHomeWidgets(fresh);
         } catch (_) {
@@ -129,10 +156,40 @@ final deadlinesProvider = FutureProvider<List<Deadline>>((ref) async {
       .toList();
 });
 
+/// Derived provider: parsed exam schedule entries.
+final examsProvider = FutureProvider<List<Exam>>((ref) async {
+  final data = await ref.watch(studentDataProvider.future);
+  return Exam.listFromJson(data.examsRaw);
+});
+
 /// User info provider.
 final userInfoProvider = FutureProvider<UserInfo>((ref) async {
+  // Watch auth state so this provider re-runs on account switch.
+  final authState = ref.watch(authProvider);
+  if (authState is! AuthAuthenticated) {
+    return const UserInfo(
+      name: '',
+      sid: '',
+      mail: '',
+      status: '',
+      course: '',
+      major: '',
+      dob: '',
+      role: '',
+      className: '',
+      address: '',
+      avatar: '',
+    );
+  }
+
   final api = ref.read(uitApiServiceProvider);
   final cache = ref.read(hiveCacheServiceProvider);
+
+  // Track whether this provider instance has been disposed/invalidated so we
+  // can guard the fire-and-forget background refresh against writing stale data
+  // from a previous account.
+  var disposed = false;
+  ref.onDispose(() => disposed = true);
 
   // Check cache first.
   final cached = cache.getCachedUserInfo();
@@ -141,7 +198,9 @@ final userInfoProvider = FutureProvider<UserInfo>((ref) async {
     Future(() async {
       try {
         final fresh = await api.getUserInfo();
+        if (disposed) return; // Provider was invalidated; discard result.
         await cache.cacheUserInfo(fresh.toJson());
+        if (disposed) return;
         ref.invalidateSelf();
       } catch (_) {}
     });

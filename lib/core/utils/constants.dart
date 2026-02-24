@@ -20,4 +20,5 @@ abstract final class HiveBoxes {
   static const String notifications = 'notifications';
   static const String deadlines = 'deadlines';
   static const String userInfo = 'user_info';
+  static const String exams = 'exams';
 }

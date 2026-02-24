@@ -29,11 +29,6 @@ class HomeScreen extends ConsumerWidget {
             tooltip: 'settings.title'.tr(),
             onPressed: () => context.push('/settings'),
           ),
-          IconButton(
-            icon: const Icon(Icons.manage_accounts_outlined),
-            tooltip: 'accounts.title'.tr(),
-            onPressed: () => context.push('/accounts'),
-          ),
         ],
       ),
       body: RefreshIndicator(

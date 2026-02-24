@@ -1,5 +1,6 @@
 export 'course.dart';
 export 'deadline.dart';
+export 'exam.dart';
 export 'fee.dart';
 export 'notification.dart';
 export 'score.dart';

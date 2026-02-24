@@ -28,28 +28,20 @@ final filteredDeadlinesProvider = FutureProvider<List<Deadline>>((ref) async {
   return switch (filter) {
     DeadlineFilter.all => all,
     DeadlineFilter.pending => all.where((d) => _isPending(d)).toList(),
-    DeadlineFilter.finished =>
-      all.where((d) => d.status != null && d.status!.isNotEmpty).toList(),
+    DeadlineFilter.finished => all.where((d) => _isSubmitted(d)).toList(),
     DeadlineFilter.overdue => all.where((d) => _isOverdue(d)).toList(),
   };
 });
 
-bool _isPending(Deadline d) =>
-    (d.status == null || d.status!.isEmpty) && !_isOverdue(d);
+/// API status mapping:
+///   null        → pending (chưa nộp, còn trong hạn)
+///   "new"       → overdue (chưa nộp, đã quá hạn)
+///   "submitted" → finished (đã nộp)
+bool _isPending(Deadline d) => d.status == null;
 
-bool _isOverdue(Deadline d) {
-  if (d.status != null && d.status!.isNotEmpty) return false;
-  // Try to parse the date from niceDate to determine if overdue.
-  // niceDate is typically a human-readable date string from the API.
-  // We do a best-effort parse; if it fails, treat as not overdue.
-  try {
-    final parsed = DateTime.tryParse(d.niceDate);
-    if (parsed != null) return parsed.isBefore(DateTime.now());
-  } catch (_) {
-    // ignore
-  }
-  return false;
-}
+bool _isSubmitted(Deadline d) => d.status == 'submitted';
+
+bool _isOverdue(Deadline d) => d.status == 'new';
 
 /// Displays upcoming deadlines/assignments with filter toggles.
 class DeadlinesScreen extends ConsumerWidget {
@@ -159,16 +151,20 @@ class _DeadlineTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isSubmitted = deadline.status != null && deadline.status!.isNotEmpty;
+    final isSubmitted = _isSubmitted(deadline);
     final isOverdue = _isOverdue(deadline);
+    final isPending = _isPending(deadline);
 
     final (IconData icon, Color color) = switch (true) {
       _ when isSubmitted => (
         Icons.check_circle_rounded,
         theme.colorScheme.primary,
       ),
-      _ when isOverdue => (Icons.error_outline, theme.colorScheme.error),
-      _ => (Icons.assignment_late_outlined, theme.colorScheme.tertiary),
+      _ when isOverdue => (
+        Icons.assignment_late_outlined,
+        theme.colorScheme.error,
+      ),
+      _ => (Icons.assignment_outlined, theme.colorScheme.tertiary),
     };
 
     return Card(
@@ -203,40 +199,23 @@ class _DeadlineTile extends StatelessWidget {
                 ),
                 if (isSubmitted) ...[
                   const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'deadlines.submitted'.tr(),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
+                  _StatusBadge(
+                    label: 'deadlines.submitted'.tr(),
+                    color: theme.colorScheme.primary,
+                  ),
+                ],
+                if (isPending) ...[
+                  const SizedBox(width: 8),
+                  _StatusBadge(
+                    label: 'deadlines.pending'.tr(),
+                    color: theme.colorScheme.tertiary,
                   ),
                 ],
                 if (isOverdue) ...[
                   const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.error.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'deadlines.overdue'.tr(),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.error,
-                      ),
-                    ),
+                  _StatusBadge(
+                    label: 'deadlines.overdue'.tr(),
+                    color: theme.colorScheme.error,
                   ),
                 ],
               ],
@@ -244,6 +223,29 @@ class _DeadlineTile extends StatelessWidget {
           ],
         ),
         isThreeLine: true,
+      ),
+    );
+  }
+}
+
+/// A small colored label badge used to display deadline status.
+class _StatusBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _StatusBadge({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color),
       ),
     );
   }
