@@ -152,33 +152,41 @@ uit-mobile/
 ## Key Technologies & Packages
 
 ### Core Framework
+
 - **Flutter 3.x** (stable) - Cross-platform UI framework
 - **Dart 3.11.0+** - Language with null safety
 
 ### State Management
+
 - **Flutter Riverpod 3.2.1** - Reactive state management using `Notifier`/`NotifierProvider` and `AsyncNotifier`/`AsyncNotifierProvider` (NOT StateNotifier)
 
 ### HTTP & Networking
+
 - **Dio 5.9.1** - HTTP client with interceptor support
 - Custom `JwtInterceptor` for auto-refresh on 401, request queuing
 
 ### Routing
+
 - **GoRouter 17.1.0** - Declarative routing with nested routes and auth guards
 
 ### Storage
+
 - **flutter_secure_storage 10.0.0** - Encrypted JWT token storage (multi-account)
 - **hive_flutter 1.1.0** - Local offline-first caching
 - **home_widget 0.9.0** - Push timetable/deadline data to native home screen widgets
 
 ### Internationalization
+
 - **easy_localization 3.0.8** - Dart-based i18n (EN/VI)
 - **intl 0.20.2** - Date formatting
 
 ### Serialization
+
 - **json_annotation 4.11.0** - JSON codec generation
 - **freezed_annotation 3.1.0** - Immutable model generation (optional, used selectively)
 
 ### Development
+
 - **build_runner 2.11.1** - Code generation
 - **riverpod_generator 4.0.3** - Generate AsyncNotifier providers
 - **json_serializable 6.13.0** - Generate `fromJson`/`toJson` methods
@@ -230,23 +238,27 @@ uit-mobile/
 UIT API uses custom auth scheme:
 
 **Credentials Encoding**:
+
 ```dart
 base64("3sn@fah.{studentId}:{password}")
 // Sent as: Authorization: UitAu {encoded}
 ```
 
 **Token Encoding**:
+
 ```dart
 base64("3sn@fah.{jwtToken}:")
 // Sent as: Authorization: UitAu {encoded}
 ```
 
 **Day-of-Week Mapping** (API vs Dart):
+
 - API: 2=Mon, 3=Tue, 4=Wed, 5=Thu, 6=Fri, 7=Sat, 8=Sun
 - Dart: 1=Mon, 2=Tue, ..., 7=Sun
 - Conversion: `(weekday + 1).toString()` (API) ↔ `(parseInt(apiDay) - 1)` (Dart)
 
 **API Oddities**:
+
 - `magv` field (lecturer data) is a `List<Map>`, not a String
 - `courses[].name` and `scores[].name` can be returned as `int` or `String`
 - Exempted courses (`"Miễn"`) have `diem: "0"` and all weights = `"0"` in API
@@ -256,11 +268,13 @@ base64("3sn@fah.{jwtToken}:")
 ## GPA Calculation
 
 **Criteria for Inclusion**:
+
 - Course must NOT be exempted (all weights = 0)
 - Final grade must be numeric (parseable to `double`)
 - Credits must be > 0
 
 **Calculation**:
+
 ```
 GPA = Σ(grade × credits) / Σ(credits)
 ```
@@ -318,11 +332,13 @@ Accessed via `'key.path'.tr()` (EasyLocalization).
 **Repository**: `KevinNitroG/uit_mobile` on GitHub
 
 **Commit Convention**: Follows [Conventional Commits](https://www.conventionalcommits.org/):
+
 - `feat: ...` → Minor version bump + release note
 - `fix: ...` → Patch version bump
 - `docs: ...`, `chore: ...`, `test: ...` → No version bump (hidden in changelog)
 
 **Release Pipeline**:
+
 1. Merge feature/fix branches to `main`
 2. GitHub Action `release-please` creates Release PR with:
    - Version bump in `pubspec.yaml` (SemVer + build number)
@@ -331,6 +347,7 @@ Accessed via `'key.path'.tr()` (EasyLocalization).
 4. `build.yml` action optionally builds APK/IPA artifacts
 
 **Version Format**: `X.Y.Z+N` (e.g., `0.1.0+1`)
+
 - X.Y.Z = SemVer
 - N = build number (auto-incremented by release-please)
 

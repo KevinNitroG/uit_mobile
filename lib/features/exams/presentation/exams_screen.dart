@@ -141,11 +141,11 @@ class _ExamCard extends StatelessWidget {
               ),
             ],
 
-            // Any extra fields the API may return
+            // Any extra fields the API may return (show values only)
             for (final entry in extraDetails) ...[
               const SizedBox(height: 4),
               Text(
-                '${entry.key}: ${entry.value}',
+                entry.value,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.outline,
                 ),

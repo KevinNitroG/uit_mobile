@@ -108,11 +108,10 @@ class ScoreSemester {
   const ScoreSemester({required this.name, required this.scores});
 
   factory ScoreSemester.fromJson(Map<String, dynamic> json) {
-    // API returns name as either int or String
-    final nameValue = json['name'];
-    final name = nameValue is int
-        ? nameValue.toString()
-        : (nameValue as String? ?? '');
+    var name = (json['name'] as String?) ?? '';
+    if (name.startsWith('Điểm: ')) {
+      name = name.substring(6);
+    }
 
     return ScoreSemester(
       name: name,
