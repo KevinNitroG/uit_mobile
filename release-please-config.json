@@ -7,9 +7,9 @@
       "extra-files": [
         {
           "type": "generic",
-          "path": "lib/features/settings/presentation/settings_screen.dart",
-          "search-by-regex": "const _kAppVersion = 'v\\d+\\.\\d+\\.\\d+'; // x-release-please-version",
-          "replace": "const _kAppVersion = 'v{{version}}'; // x-release-please-version"
+          "path": "lib/features/settings/providers/update_check_provider.dart",
+          "search-by-regex": "const kCurrentAppVersion = 'v\\d+\\.\\d+\\.\\d+';",
+          "replace": "const kCurrentAppVersion = 'v{{version}}';"
         }
       ],
       "changelog-sections": [

@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Keep in sync with the constant in settings_screen.dart.
+/// Current app version — single source of truth for the update check.
 // x-release-please-version
-const _kCurrentAppVersion = 'v1.0.1';
+const kCurrentAppVersion = 'v1.0.1';
 
 const _kGithubReleasesUrl =
     'https://api.github.com/repos/KevinNitroG/uit_mobile/releases/latest';
@@ -61,7 +61,7 @@ class UpdateCheckNotifier extends AsyncNotifier<UpdateCheckResult> {
         return const UpdateCheckFailed(error: 'Missing tag_name in response');
       }
 
-      return isNewerVersion(_kCurrentAppVersion, tagName)
+      return isNewerVersion(kCurrentAppVersion, tagName)
           ? UpdateCheckUpdateAvailable(latestVersion: tagName)
           : const UpdateCheckUpToDate();
     } catch (e) {

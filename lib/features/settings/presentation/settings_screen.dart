@@ -6,8 +6,6 @@ import 'package:uit_mobile/features/auth/providers/auth_provider.dart';
 import 'package:uit_mobile/features/settings/providers/update_check_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-const _kAppVersion = 'v1.0.1'; // x-release-please-version
-
 /// Settings screen with language switching and account management.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -119,7 +117,7 @@ class SettingsScreen extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.info_outline),
                   title: const Text('UIT Mobile'),
-                  subtitle: const Text(_kAppVersion),
+                  subtitle: Text(kCurrentAppVersion),
                 ),
                 const Divider(height: 1),
                 ListTile(
