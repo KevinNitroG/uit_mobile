@@ -17,6 +17,7 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('UIT'),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),

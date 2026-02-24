@@ -100,6 +100,10 @@ class AuthNotifier extends Notifier<AuthState> {
       await _storage.upsertSession(session);
       await _storage.setActiveSessionId(studentId);
 
+      // Invalidate the sessions provider so the accounts screen reflects the
+      // newly added/updated session.
+      ref.invalidate(sessionsProvider);
+
       state = AuthAuthenticated(session);
     } catch (e) {
       state = AuthError('Login failed: $e');
@@ -112,6 +116,7 @@ class AuthNotifier extends Notifier<AuthState> {
     try {
       await _storage.setActiveSessionId(studentId);
       final session = await _storage.getActiveSession();
+      ref.invalidate(sessionsProvider);
       if (session != null) {
         state = AuthAuthenticated(session);
       } else {
@@ -125,6 +130,7 @@ class AuthNotifier extends Notifier<AuthState> {
   /// Removes a session and logs out if it was the active one.
   Future<void> removeAccount(String studentId) async {
     await _storage.removeSession(studentId);
+    ref.invalidate(sessionsProvider);
     final activeId = await _storage.getActiveSessionId();
     if (activeId == studentId) {
       await _storage.clearActiveSession();
