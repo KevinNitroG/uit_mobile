@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uit_mobile/features/auth/providers/auth_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-const _kAppVersion = 'v1.0.0'; // x-release-please-version
+const _kAppVersion = 'v1.0.1'; // x-release-please-version
 
 /// Settings screen with language switching and account management.
 class SettingsScreen extends ConsumerWidget {

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.0...v1.0.1) (2026-02-24)
+
+
+### Refactoring
+
+* improve ui/ux across multiple screens ([f429c10](https://github.com/KevinNitroG/uit_mobile/commit/f429c107effa5fe1e315e03437e8798f27e881b8))
+
 ## [1.0.0](https://github.com/KevinNitroG/uit_mobile/compare/v0.3.0...v1.0.0) (2026-02-24)
 
 
