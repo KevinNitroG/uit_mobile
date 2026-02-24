@@ -3,11 +3,12 @@
 ## Prerequisites
 
 ### System Requirements
+
 - **OS**: macOS (for iOS), Linux/Windows (for Android only)
 - **Flutter**: 3.x (stable)
 - **Dart**: 3.11.0+
 - **Android**: SDK 36, NDK 27.2.12479018, Java 17
-- **iOS**: Xcode 15.0+, iOS SDK 16.0+
+- **iOS**: Xcode 15.0+, iOS SDK 15.0+
 
 ### Tools Installation
 
@@ -33,6 +34,7 @@ flutter pub get
 ### 1. Configure Local Environment
 
 **Android** (`android/app/build.gradle.kts`):
+
 - `compileSdk = 36`
 - `minSdk = 33` (Android 13+)
 - `targetSdk = 36`
@@ -40,8 +42,9 @@ flutter pub get
 - `sourceCompatibility = JavaVersion.VERSION_17`
 
 **iOS** (`ios/Runner/Info.plist`):
+
 - `CFBundleIdentifier`: `com.kevinnitro.uitMobile` (set dynamically in Xcode)
-- Minimum deployment target: iOS 16.0
+- Minimum deployment target: iOS 15.0
 
 ### 2. Dart/Flutter Setup
 
@@ -59,6 +62,7 @@ flutter analyze --no-fatal-infos
 ### 3. App Signing (Production Only)
 
 **Android**:
+
 ```bash
 # Generate keystore (one-time)
 keytool -genkey -v -keystore ~/key.jks \
@@ -73,6 +77,7 @@ keytool -genkey -v -keystore ~/key.jks \
 ```
 
 **iOS**:
+
 ```bash
 # Use Xcode to manage signing certificates & provisioning profiles
 # Open ios/Runner.xcworkspace
@@ -87,23 +92,27 @@ keytool -genkey -v -keystore ~/key.jks \
 ### Debug Build (Development)
 
 **Android** (on connected device):
+
 ```bash
 flutter run -d <device_id>  # or -d emulator-5554
 ```
 
 **Build APK**:
+
 ```bash
 flutter build apk --debug
 # Output: build/app/outputs/flutter-apk/app-debug.apk
 ```
 
 **Manual install**:
+
 ```bash
-adb -s <device_id> install -r build/app/outputs/flutter-apk/app-debug.apk
-adb -s <device_id> shell am start -n com.kevinnitro.uit_mobile/.MainActivity
+adb -s -r build/app/outputs/flutter-apk/app-debug.apk <device_id >install
+adb -s am start -n com.kevinnitro.uit_mobile/.MainActivity <device_id >shell
 ```
 
 **iOS** (on simulator or physical device):
+
 ```bash
 # Simulator (default)
 flutter run
@@ -119,18 +128,21 @@ flutter build ipa --release --no-codesign
 ### Release Build (Production)
 
 **Android** (signed APK):
+
 ```bash
 flutter build apk --release
 # Output: build/app/outputs/apk/release/app-release.apk
 ```
 
 **Android** (AAB for Play Store):
+
 ```bash
 flutter build appbundle --release
 # Output: build/app/outputs/bundle/release/app-release.aab
 ```
 
 **iOS** (IPA for App Store):
+
 ```bash
 flutter build ipa --release
 # Output: build/ios/archive/Runner.xcarchive
@@ -143,6 +155,7 @@ flutter build ipa --release
 ## Testing
 
 ### Static Analysis
+
 ```bash
 flutter analyze --no-fatal-infos
 # Expected: 0 errors, ≤ 1 info (unnecessary_underscores in period_info_screen)
@@ -172,11 +185,13 @@ flutter analyze --no-fatal-infos
 ### GitHub Actions Workflows
 
 **`release-please.yml`**:
+
 - Runs on: `push` to `main`
 - Action: Creates Release PR with bumped version (`pubspec.yaml`) + CHANGELOG
 - Triggers: `build.yml` on release creation
 
 **`build.yml`**:
+
 - Runs on: `push` (to `lib/`, `assets/`, `android/`, `ios/`), `workflow_dispatch`, or called from `release-please.yml`
 - Jobs:
   1. **analyze**: `flutter analyze --no-fatal-infos`
@@ -187,6 +202,7 @@ flutter analyze --no-fatal-infos
 ### Conventional Commits
 
 To trigger version bumps:
+
 ```bash
 # Feature (minor bump: 0.1.0 → 0.2.0)
 git commit -m "feat: add feature name"
@@ -260,11 +276,13 @@ flutter:
 ### Build Errors
 
 **Java 25 Gradle error**:
+
 - Issue: `IllegalArgumentException: 25.0.2` (Gradle 8.14 doesn't support Java 25)
 - Fix: Install Java 17 or 21, set `JAVA_HOME=/path/to/java17`
 - Note: Build succeeds despite warning
 
 **Flutter dependencies conflict**:
+
 ```bash
 flutter pub get
 flutter pub upgrade --major-versions
@@ -272,6 +290,7 @@ flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
 **iOS pod issues**:
+
 ```bash
 cd ios && rm -rf Pods Podfile.lock && pod install && cd ..
 ```
@@ -279,26 +298,30 @@ cd ios && rm -rf Pods Podfile.lock && pod install && cd ..
 ### Device Connection
 
 **Android device not recognized**:
+
 ```bash
 adb devices
 adb kill-server && adb start-server
-adb -s <device_id> shell am start -n com.kevinnitro.uit_mobile/.MainActivity
+adb -s am start -n com.kevinnitro.uit_mobile/.MainActivity <device_id >shell
 ```
 
 **iOS simulator lagging**:
+
 ```bash
-xcrun simctl erase all  # Reset all simulators
-flutter run -d iPhone\ 15  # Specify device
+xcrun simctl erase all    # Reset all simulators
+flutter run -d iPhone\ 15 # Specify device
 ```
 
 ### API Authentication
 
 **401 Unauthorized**:
+
 - Check credentials (Student ID + password)
 - Verify encoding is correct: `base64("3sn@fah.{id}:{password}")`
 - Check JWT refresh in interceptor logs
 
 **API data parsing error**:
+
 - API returns unexpected field types (e.g., `name` as `int` instead of `String`)
 - Models handle both with `int.tryParse()` fallback
 - Check `uit.md` for schema details
@@ -373,6 +396,7 @@ xcrun simctl list  # iOS simulators
 ## Support
 
 For issues or questions:
+
 - Check `ARCHITECTURE.md` for project structure
 - Review `PLAN.md` for feature implementation details
 - See `uit.md` for API documentation
