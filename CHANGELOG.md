@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0](https://github.com/KevinNitroG/uit_mobile/compare/v0.2.0...v0.3.0) (2026-02-24)
+
+
+### Features
+
+* i18n for day in timetable ([13e12a1](https://github.com/KevinNitroG/uit_mobile/commit/13e12a16f537f35ddb504b7e511f6e338957b6d0))
+
+
+### Documentation
+
+* README ([bf49620](https://github.com/KevinNitroG/uit_mobile/commit/bf49620715105209d9d573bc4b17bec0ff4811e4))
+* **README:** some todo feature ([916f030](https://github.com/KevinNitroG/uit_mobile/commit/916f0308e40aad31ddb5e1860f3a0df083827ce1))
+
 ## [0.2.0](https://github.com/KevinNitroG/uit_mobile/compare/v0.1.0...v0.2.0) (2026-02-24)
 
 
