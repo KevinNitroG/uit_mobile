@@ -38,12 +38,21 @@
     "chooseAccount": "Choose an account",
     "chooseAccountSubtitle": "Select an account to continue"
   },
-  "timetable": {
-    "title": "Timetable",
-    "noCourses": "No courses found",
-    "period": "Period {}",
-    "periodInfo": "Period Info"
-  },
+   "timetable": {
+     "title": "Timetable",
+     "noCourses": "No courses found",
+     "period": "Period {}",
+     "periodInfo": "Period Info",
+     "days": {
+       "mon": "Mon",
+       "tue": "Tue",
+       "wed": "Wed",
+       "thu": "Thu",
+       "fri": "Fri",
+       "sat": "Sat",
+       "sun": "Sun"
+     }
+   },
   "deadlines": {
     "title": "Deadlines",
     "noDeadlines": "No upcoming deadlines",

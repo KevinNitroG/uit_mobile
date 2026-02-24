@@ -5,15 +5,15 @@ import 'package:go_router/go_router.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
-/// Day labels indexed by UIT day code ('2'=Mon .. '8'=Sun).
-const _dayLabels = {
-  '2': 'Mon',
-  '3': 'Tue',
-  '4': 'Wed',
-  '5': 'Thu',
-  '6': 'Fri',
-  '7': 'Sat',
-  '8': 'Sun',
+/// Day labels mapping: UIT day code ('2'=Mon .. '8'=Sun) to i18n key.
+const _dayLabelKeys = {
+  '2': 'timetable.days.mon',
+  '3': 'timetable.days.tue',
+  '4': 'timetable.days.wed',
+  '5': 'timetable.days.thu',
+  '6': 'timetable.days.fri',
+  '7': 'timetable.days.sat',
+  '8': 'timetable.days.sun',
 };
 
 /// All UIT day codes in order.
@@ -125,7 +125,7 @@ class _DayTabViewState extends State<_DayTabView>
                 widget.dayMap[day]!.isNotEmpty;
             return Tab(
               child: Text(
-                _dayLabels[day] ?? day,
+                _dayLabelKeys[day]?.tr() ?? day,
                 style: TextStyle(
                   fontWeight: hasClasses ? FontWeight.bold : FontWeight.normal,
                   color: hasClasses ? null : theme.colorScheme.outline,
