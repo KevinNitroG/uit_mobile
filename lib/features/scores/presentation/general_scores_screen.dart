@@ -23,23 +23,22 @@ Color _gradeColorBg(ThemeData theme, double? grade) =>
 // Column definitions
 // ---------------------------------------------------------------------------
 
-/// Fixed column widths.  MAMH / LOP are wider; the rest are compact.
-const double _colMAMH = 64;
-const double _colLOP = 110;
-const double _colTC = 32;
-const double _colGrade = 38; // QT, TH, GK, CK, TB
+/// Flex ratios for each column. MAMH / LOP are wider; the rest share equally.
+const double _flexMAMH = 3;
+const double _flexLOP = 6;
+const double _flexRest = 2; // TC, QT, TH, GK, CK, TB
 
 const _headers = ['MAMH', 'LOP', 'TC', 'QT', 'TH', 'GK', 'CK', 'TB'];
 
-const _colWidths = <double>[
-  _colMAMH,
-  _colLOP,
-  _colTC,
-  _colGrade, // QT
-  _colGrade, // TH
-  _colGrade, // GK
-  _colGrade, // CK
-  _colGrade, // TB
+const _colFlex = <double>[
+  _flexMAMH,
+  _flexLOP,
+  _flexRest, // TC
+  _flexRest, // QT
+  _flexRest, // TH
+  _flexRest, // GK
+  _flexRest, // CK
+  _flexRest, // TB
 ];
 
 // ---------------------------------------------------------------------------
@@ -119,7 +118,7 @@ class _SemesterCard extends StatelessWidget {
           // ── Semester header ──────────────────────────────────────────────
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
             decoration: BoxDecoration(
               color: cs.primaryContainer.withValues(alpha: 0.45),
             ),
@@ -135,13 +134,12 @@ class _SemesterCard extends StatelessWidget {
           ),
 
           // ── Table ────────────────────────────────────────────────────────
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
             child: _ScoreTable(scores: semester.scores),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
         ],
       ),
     );
@@ -162,26 +160,28 @@ class _ScoreTable extends StatelessWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    // Build TableColumnWidth map from the fixed widths list.
+    // Build TableColumnWidth map from the flex ratios list.
     final colWidths = <int, TableColumnWidth>{
-      for (var i = 0; i < _colWidths.length; i++)
-        i: FixedColumnWidth(_colWidths[i]),
+      for (var i = 0; i < _colFlex.length; i++) i: FlexColumnWidth(_colFlex[i]),
     };
 
-    return Table(
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      columnWidths: colWidths,
-      children: [
-        // Header row
-        _buildHeaderRow(theme, cs),
-        // Divider after header
-        _buildDividerRow(cs, bold: true),
-        // Data rows
-        for (var i = 0; i < scores.length; i++) ...[
-          _buildDataRow(theme, cs, scores[i], isEven: i.isEven),
-          _buildDividerRow(cs),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 600),
+      child: Table(
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        columnWidths: colWidths,
+        children: [
+          // Header row
+          _buildHeaderRow(theme, cs),
+          // Divider after header
+          _buildDividerRow(cs, bold: true),
+          // Data rows
+          for (var i = 0; i < scores.length; i++) ...[
+            _buildDataRow(theme, cs, scores[i], isEven: i.isEven),
+            _buildDividerRow(cs),
+          ],
         ],
-      ],
+      ),
     );
   }
 
@@ -195,7 +195,7 @@ class _ScoreTable extends StatelessWidget {
             (h) => _Cell(
               child: Text(
                 h,
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.left,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: cs.onSurfaceVariant,
@@ -250,9 +250,7 @@ class _ScoreTable extends StatelessWidget {
           child: Text(
             score.subjectCode,
             textAlign: TextAlign.left,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: theme.textTheme.bodySmall,
           ),
         ),
         // LOP

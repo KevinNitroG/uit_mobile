@@ -106,16 +106,12 @@ class DeadlinesScreen extends ConsumerWidget {
                 }
 
                 return SelectionArea(
-                  child: RefreshIndicator(
-                    onRefresh: () async =>
-                        ref.read(studentDataProvider.notifier).refresh(),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: deadlines.length,
-                      itemBuilder: (context, index) {
-                        return _DeadlineTile(deadline: deadlines[index]);
-                      },
-                    ),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: deadlines.length,
+                    itemBuilder: (context, index) {
+                      return _DeadlineTile(deadline: deadlines[index]);
+                    },
                   ),
                 );
               },
@@ -169,50 +165,59 @@ class _DeadlineTile extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(icon, color: color),
-        title: Text(deadline.name, style: theme.textTheme.bodyLarge),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              deadline.shortname,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.outline,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(
-                  Icons.schedule,
-                  size: 14,
-                  color: theme.colorScheme.secondary,
-                ),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    deadline.niceDate,
+            Icon(icon, color: color),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(deadline.name, style: theme.textTheme.bodyLarge),
+                  const SizedBox(height: 2),
+                  Text(
+                    deadline.shortname,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.secondary,
-                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.outline,
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                _StatusBadge(label: badgeKey.tr(), color: color),
-                if (deadline.closed) ...[
-                  const SizedBox(width: 6),
-                  _StatusBadge(
-                    label: 'deadlines.closed'.tr(),
-                    color: theme.colorScheme.outline,
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.schedule,
+                        size: 14,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          deadline.niceDate,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.secondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      _StatusBadge(label: badgeKey.tr(), color: color),
+                      if (deadline.closed) ...[
+                        const SizedBox(width: 6),
+                        _StatusBadge(
+                          label: 'deadlines.closed'.tr(),
+                          color: theme.colorScheme.outline,
+                        ),
+                      ],
+                    ],
                   ),
                 ],
-              ],
+              ),
             ),
           ],
         ),
-        isThreeLine: true,
       ),
     );
   }

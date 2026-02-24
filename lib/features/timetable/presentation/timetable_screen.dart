@@ -113,6 +113,7 @@ class _DayTabViewState extends State<_DayTabView>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final todayUitDay = (DateTime.now().weekday + 1).toString();
 
     return Column(
       children: [
@@ -123,13 +124,32 @@ class _DayTabViewState extends State<_DayTabView>
             final hasClasses =
                 widget.dayMap.containsKey(day) &&
                 widget.dayMap[day]!.isNotEmpty;
+            final isToday = day == todayUitDay;
             return Tab(
-              child: Text(
-                _dayLabelKeys[day]?.tr() ?? day,
-                style: TextStyle(
-                  fontWeight: hasClasses ? FontWeight.bold : FontWeight.normal,
-                  color: hasClasses ? null : theme.colorScheme.outline,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _dayLabelKeys[day]?.tr() ?? day,
+                    style: TextStyle(
+                      fontWeight: hasClasses
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: hasClasses ? null : theme.colorScheme.outline,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isToday
+                          ? theme.colorScheme.primary
+                          : Colors.transparent,
+                    ),
+                  ),
+                ],
               ),
             );
           }).toList(),

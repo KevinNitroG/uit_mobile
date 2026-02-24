@@ -338,7 +338,7 @@ class _FeeCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      '${s.code} (${s.credits} ${'scores.credits'.tr()})',
+                      '${s.code} (${double.tryParse(s.credits)?.toInt() ?? s.credits})',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSecondaryContainer,
                       ),

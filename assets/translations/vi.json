@@ -118,7 +118,8 @@
   "common": {
     "retry": "Thử lại",
     "cancel": "Hủy",
-    "remove": "Xóa"
+    "remove": "Xóa",
+    "refresh": "Làm mới"
   },
   "fees": {
     "title": "Học phí",

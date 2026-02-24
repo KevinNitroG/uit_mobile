@@ -20,6 +20,14 @@ class HomeScreen extends ConsumerWidget {
         centerTitle: true,
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'common.refresh'.tr(),
+            onPressed: () {
+              ref.invalidate(userInfoProvider);
+              ref.read(studentDataProvider.notifier).refresh();
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.notifications_outlined),
             tooltip: 'notifications.title'.tr(),
             onPressed: () => context.push('/notifications'),

@@ -118,7 +118,8 @@
   "common": {
     "retry": "Retry",
     "cancel": "Cancel",
-    "remove": "Remove"
+    "remove": "Remove",
+    "refresh": "Refresh"
   },
   "fees": {
     "title": "Tuition Fees",
