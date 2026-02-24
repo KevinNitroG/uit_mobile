@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.2](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.1...v1.0.2) (2026-02-24)
+
+
+### Refactoring
+
+* the way release please track version ([2e30e78](https://github.com/KevinNitroG/uit_mobile/commit/2e30e782de50abe97c93e21175466ff4c0a72be6))
+
+
+### Documentation
+
+* **README:** note feature cache and refresh token ([86ab15d](https://github.com/KevinNitroG/uit_mobile/commit/86ab15d1e066c468ec973f33340eda5086cd3020))
+
 ## [1.0.1](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.0...v1.0.1) (2026-02-24)
 
 
