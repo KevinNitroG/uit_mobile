@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.4](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.3...v1.0.4) (2026-02-25)
+
+
+### Bug Fixes
+
+* no total debt? just check is paid in fee ([11259c2](https://github.com/KevinNitroG/uit_mobile/commit/11259c2824a19b71825528e8e80886f0f4ac8581))
+
+
+### Documentation
+
+* **README:** note no maintain ([b30dd22](https://github.com/KevinNitroG/uit_mobile/commit/b30dd22405a86a5f7c9edcec26144174617dd5d9))
+
 ## [1.0.3](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.2...v1.0.3) (2026-02-25)
 
 
