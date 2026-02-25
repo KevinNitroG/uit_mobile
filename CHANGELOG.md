@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.2.0](https://github.com/KevinNitroG/uit_mobile/compare/v1.1.0...v1.2.0) (2026-02-25)
+
+
+### Features
+
+* add address to profile, deadline URL dialog, TeachingFormat enum, debug raw view toggle, clean fees summary ([cb3a391](https://github.com/KevinNitroG/uit_mobile/commit/cb3a391e4e98d9cf0aadc722a85618ac54419e89))
+
+
+### Bug Fixes
+
+* **deadlines:** parse cmid from correct 'id' API field, simplify url dialog ([6f20b03](https://github.com/KevinNitroG/uit_mobile/commit/6f20b03cdf00fbd07ba14a42cd76c43eba7909b4))
+* ensure deadline dialog always shows, with fallback to Moodle courses page ([68d3fd7](https://github.com/KevinNitroG/uit_mobile/commit/68d3fd7898e6759de636060dac5453452ecca693))
+
+
+### Refactoring
+
+* ai didn't cleanup the cmid because context compaction ([512ec91](https://github.com/KevinNitroG/uit_mobile/commit/512ec915cd9df652e4ceb01a26a199f27d781087))
+
 ## [1.1.0](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.6...v1.1.0) (2026-02-25)
 
 
