@@ -2,7 +2,7 @@
 
 A vibe coded flutter app for android (13+) and iOS (15+)
 
-> No further development
+> No further development, this is garbage from AI, cannot be maintained
 
 ## Installation
 
