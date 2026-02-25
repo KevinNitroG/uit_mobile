@@ -70,7 +70,8 @@
     "overdue": "Overdue",
     "closed": "Closed",
     "openWebsite": "Open Website",
-    "open": "Open"
+    "open": "Open",
+    "visitMoodle": "The assignment URL is not available. Click below to visit the Moodle courses page."
   },
   "scores": {
     "title": "Scores",

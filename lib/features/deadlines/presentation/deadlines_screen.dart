@@ -140,7 +140,34 @@ class _DeadlineTile extends StatelessWidget {
 
   Future<void> _showOpenUrlDialog(BuildContext context) async {
     final url = deadline.url;
-    if (url == null) return;
+
+    // If no cmid, show a message to visit courses.uit.edu.vn
+    if (url == null) {
+      await showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('deadlines.openWebsite'.tr()),
+          content: Text('deadlines.visitMoodle'.tr()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('common.cancel'.tr()),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                launchUrl(
+                  Uri.parse('https://courses.uit.edu.vn'),
+                  mode: LaunchMode.externalApplication,
+                );
+              },
+              child: Text('deadlines.open'.tr()),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -193,7 +220,7 @@ class _DeadlineTile extends StatelessWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(12),
-      onTap: deadline.url != null ? () => _showOpenUrlDialog(context) : null,
+      onTap: () => _showOpenUrlDialog(context),
       child: Card(
         margin: const EdgeInsets.only(bottom: 8),
         child: Padding(
