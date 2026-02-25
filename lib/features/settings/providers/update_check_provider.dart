@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Current app version — single source of truth for the update check.
 // x-release-please-version
-const kCurrentAppVersion = 'v1.0.1';
+const kCurrentAppVersion = '1.0.1';
 
 const _kGithubReleasesUrl =
     'https://api.github.com/repos/KevinNitroG/uit_mobile/releases/latest';
@@ -89,9 +89,17 @@ bool isNewerVersion(String current, String latest) {
 
 (int, int, int)? _parse(String version) {
   final clean = version.startsWith('v') ? version.substring(1) : version;
-  final parts = clean.split('.');
-  if (parts.length != 3) return null;
+  final baseVersion = clean.split('-').first.split('+').first; 
+  
+  final parts = baseVersion.split('.');
+  if (parts.length < 2) return null;
+
   final nums = parts.map(int.tryParse).toList();
   if (nums.any((n) => n == null)) return null;
-  return (nums[0]!, nums[1]!, nums[2]!);
+
+  return (
+    nums[0]!, 
+    nums.length > 1 ? nums[1]! : 0, 
+    nums.length > 2 ? nums[2]! : 0
+  );
 }

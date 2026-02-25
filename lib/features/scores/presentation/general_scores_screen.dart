@@ -139,7 +139,7 @@ class _SemesterCard extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 300, maxWidth: 800),
+              constraints: const BoxConstraints(minWidth: 270, maxWidth: 400),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: _ScoreTable(scores: semester.scores),
