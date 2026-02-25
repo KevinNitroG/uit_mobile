@@ -358,13 +358,10 @@ class _FeesSection extends StatelessWidget {
         }
 
         final totalDue = fees.fold<double>(0, (s, f) => s + f.due);
-        final totalPaid = fees.fold<double>(0, (s, f) => s + f.paid);
-        final totalDebt = fees.fold<double>(0, (s, f) => s + f.debt);
-        final totalRemaining = totalDue - totalPaid + totalDebt;
+        final totalRemaining = fees.fold<double>(0, (s, f) => s + f.remaining);
         final allPaid = totalRemaining <= 0;
-        final totalObligation = totalDue + totalDebt;
-        final progress = totalObligation > 0
-            ? ((totalDue - totalRemaining) / totalObligation).clamp(0.0, 1.0)
+        final progress = totalDue > 0
+            ? ((totalDue - totalRemaining) / totalDue).clamp(0.0, 1.0)
             : 1.0;
 
         return InkWell(

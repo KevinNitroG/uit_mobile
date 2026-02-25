@@ -49,22 +49,23 @@ class Fee {
   double get paid => double.tryParse(amountPaid) ?? 0;
   double get debt => double.tryParse(previousDebt) ?? 0;
 
-  /// remaining = due - paid + previousDebt
-  /// A value <= 0 means nothing left to pay.
-  double get remaining => due - paid + debt;
+  /// remaining = max(due - paid, 0)
+  /// Per semester: if paid exceeds due, remaining is 0 (no negative).
+  double get remaining {
+    final r = due - paid;
+    return r < 0 ? 0 : r;
+  }
 
-  /// Whether this semester's fee is fully settled (remaining <= 0).
+  /// Whether this semester's fee is fully settled (remaining == 0).
   bool get isPaid => remaining <= 0;
 
   /// Progress value in [0.0, 1.0].
   ///
-  /// Represents the fraction of the total obligation (due + previousDebt) that
-  /// has been covered:  (due - remaining) / (due + previousDebt).
-  /// When the total obligation is zero or negative, returns 1.0 (fully paid).
+  /// Represents the fraction paid: paid / due.
+  /// When due is zero, returns 1.0 (nothing owed).
   double get progress {
-    final total = due + debt;
-    if (total <= 0) return 1.0;
-    return ((due - remaining) / total).clamp(0.0, 1.0);
+    if (due <= 0) return 1.0;
+    return (paid / due).clamp(0.0, 1.0);
   }
 
   /// Parses [dkhp] into a list of (subjectCode, credits) pairs.

@@ -20,10 +20,33 @@ class DebugJsonScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
     final jsonStr = const JsonEncoder.withIndent('  ').convert(data);
 
-    // Wrap data in a Map for JsonView.map when it's already a Map;
-    // otherwise encode as string.
+    final jsonTheme = JsonViewTheme(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      viewType: JsonViewType.collapsible,
+      keyStyle: TextStyle(
+        color: cs.primary,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      stringStyle: TextStyle(color: cs.secondary, fontSize: 14),
+      intStyle: TextStyle(color: cs.tertiary, fontSize: 14),
+      doubleStyle: TextStyle(color: cs.tertiary, fontSize: 14),
+      boolStyle: TextStyle(color: cs.error, fontSize: 14),
+      openIcon: Icon(Icons.expand_less, color: cs.primary, size: 20),
+      closeIcon: Icon(Icons.expand_more, color: cs.primary, size: 20),
+      separator: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Icon(
+          Icons.arrow_right_alt_outlined,
+          size: 18,
+          color: cs.outline,
+        ),
+      ),
+    );
+
     final bool isMap = data is Map<String, dynamic>;
 
     return Scaffold(
@@ -47,20 +70,8 @@ class DebugJsonScreen extends StatelessWidget {
       ),
       body: SelectionArea(
         child: isMap
-            ? JsonView.map(
-                data as Map<String, dynamic>,
-                theme: JsonViewTheme(
-                  backgroundColor: theme.scaffoldBackgroundColor,
-                  viewType: JsonViewType.collapsible,
-                ),
-              )
-            : JsonView.string(
-                jsonStr,
-                theme: JsonViewTheme(
-                  backgroundColor: theme.scaffoldBackgroundColor,
-                  viewType: JsonViewType.collapsible,
-                ),
-              ),
+            ? JsonView.map(data as Map<String, dynamic>, theme: jsonTheme)
+            : JsonView.string(jsonStr, theme: jsonTheme),
       ),
     );
   }
