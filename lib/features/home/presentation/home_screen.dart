@@ -412,28 +412,25 @@ class _FeesSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // Total due / Remaining summary
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${'fees.totalDue'.tr()}: ${_formatCurrency(totalDue)}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      Text(
-                        allPaid
-                            ? 'fees.paidInFull'.tr()
-                            : '${'fees.remaining'.tr()}: ${_formatCurrency(totalRemaining)}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: allPaid
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.error,
-                        ),
-                      ),
-                    ],
+                  // Total due
+                  Text(
+                    '${'fees.totalDue'.tr()}: ${_formatCurrency(totalDue)}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  // Remaining / paid-in-full status
+                  Text(
+                    allPaid
+                        ? 'fees.paidInFull'.tr()
+                        : '${'fees.remaining'.tr()}: ${_formatCurrency(totalRemaining)}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: allPaid
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.error,
+                    ),
                   ),
                 ],
               ),

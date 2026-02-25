@@ -49,10 +49,10 @@ class Fee {
   double get paid => double.tryParse(amountPaid) ?? 0;
   double get debt => double.tryParse(previousDebt) ?? 0;
 
-  /// remaining = max(due - paid, 0)
-  /// Per semester: if paid exceeds due, remaining is 0 (no negative).
+  /// remaining = max(due - paid + previousDebt, 0)
+  /// Negative result (over-payment / credit) is clamped to 0.
   double get remaining {
-    final r = due - paid;
+    final r = due - paid + debt;
     return r < 0 ? 0 : r;
   }
 
