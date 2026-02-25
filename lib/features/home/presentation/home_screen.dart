@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
+import 'package:uit_mobile/shared/widgets/main_shell.dart';
 
 /// Home/dashboard screen showing user info overview.
 class HomeScreen extends ConsumerWidget {
@@ -226,6 +227,7 @@ class _QuickStats extends StatelessWidget {
               },
             ),
             theme: theme,
+            onTap: () => ref.read(tabIndexProvider.notifier).switchTo(1),
           ),
         ),
         const SizedBox(width: 12),
@@ -246,6 +248,7 @@ class _QuickStats extends StatelessWidget {
               },
             ),
             theme: theme,
+            onTap: () => ref.read(tabIndexProvider.notifier).switchTo(2),
           ),
         ),
       ],
@@ -258,37 +261,43 @@ class _StatCard extends StatelessWidget {
   final String label;
   final String value;
   final ThemeData theme;
+  final VoidCallback? onTap;
 
   const _StatCard({
     required this.icon,
     required this.label,
     required this.value,
     required this.theme,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Icon(icon, color: theme.colorScheme.primary),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Icon(icon, color: theme.colorScheme.primary),
+              const SizedBox(height: 8),
+              Text(
+                value,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.outline,
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.outline,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -367,27 +376,19 @@ class _FeesSection extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Header row: title + chevron
                   Row(
                     children: [
                       Icon(
-                        allPaid
-                            ? Icons.check_circle_outline
-                            : Icons.receipt_long_outlined,
-                        color: allPaid
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.error,
+                        Icons.receipt_long_outlined,
+                        color: theme.colorScheme.primary,
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          allPaid
-                              ? 'fees.paidInFull'.tr()
-                              : _formatCurrency(totalRemaining),
+                          'fees.title'.tr(),
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: allPaid
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.error,
                           ),
                         ),
                       ),
@@ -398,6 +399,7 @@ class _FeesSection extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
+                  // Progress bar
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
@@ -411,6 +413,30 @@ class _FeesSection extends StatelessWidget {
                             : theme.colorScheme.error,
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Total due / Remaining summary
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${'fees.totalDue'.tr()}: ${_formatCurrency(totalDue)}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      Text(
+                        allPaid
+                            ? 'fees.paidInFull'.tr()
+                            : '${'fees.remaining'.tr()}: ${_formatCurrency(totalRemaining)}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: allPaid
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.error,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

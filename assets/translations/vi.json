@@ -129,7 +129,8 @@
     "updateDownload": "Tải về",
     "updateLater": "Để sau",
     "checkForUpdates": "Kiểm tra cập nhật",
-    "upToDate": "Ứng dụng đã là phiên bản mới nhất"
+    "upToDate": "Ứng dụng đã là phiên bản mới nhất",
+    "debugFullResponse": "Phản hồi API đầy đủ"
   },
   "common": {
     "retry": "Thử lại",

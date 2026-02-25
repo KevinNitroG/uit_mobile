@@ -124,6 +124,7 @@
     "debugSubtitle": "View raw API data",
     "debugCopy": "Copy all JSON",
     "debugCopied": "JSON copied to clipboard",
+    "debugFullResponse": "Full API Response",
     "updateAvailableTitle": "Update Available",
     "updateAvailableMessage": "A new version {} is available. Would you like to download it?",
     "updateDownload": "Download",
