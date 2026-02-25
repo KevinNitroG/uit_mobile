@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.6](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.5...v1.0.6) (2026-02-25)
+
+
+### Bug Fixes
+
+* header of overview score be centerl ([75257a1](https://github.com/KevinNitroG/uit_mobile/commit/75257a1ce4a0235390d9e21ff4a4fd3ffc637019))
+
 ## [1.0.5](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.4...v1.0.5) (2026-02-25)
 
 
