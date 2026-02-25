@@ -143,6 +143,7 @@
      "summary": "Summary",
      "totalDue": "Total Due",
      "totalPaid": "Total Paid",
+     "totalPreviousDebt": "Previous Debt",
      "remaining": "Remaining",
      "paidInFull": "Paid in full",
      "paid": "Paid",

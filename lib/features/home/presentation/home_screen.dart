@@ -71,8 +71,6 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 24),
 
               // Tuition fees section
-              _SectionHeader(title: 'fees.title'.tr()),
-              const SizedBox(height: 8),
               _FeesSection(ref: ref, theme: theme),
             ],
           ),
@@ -350,16 +348,15 @@ class _FeesSection extends StatelessWidget {
           );
         }
 
-        final totalDue = fees.fold<double>(
-          0,
-          (sum, f) => sum + (double.tryParse(f.amountDue) ?? 0),
-        );
-        final totalPaid = fees.fold<double>(
-          0,
-          (sum, f) => sum + (double.tryParse(f.amountPaid) ?? 0),
-        );
-        final totalRemaining = totalDue - totalPaid;
-        final isPaidInFull = totalRemaining <= 0;
+        final totalDue = fees.fold<double>(0, (s, f) => s + f.due);
+        final totalPaid = fees.fold<double>(0, (s, f) => s + f.paid);
+        final totalDebt = fees.fold<double>(0, (s, f) => s + f.debt);
+        final totalRemaining = totalDue - totalPaid + totalDebt;
+        final allPaid = totalRemaining <= 0;
+        final totalObligation = totalDue + totalDebt;
+        final progress = totalObligation > 0
+            ? ((totalDue - totalRemaining) / totalObligation).clamp(0.0, 1.0)
+            : 1.0;
 
         return InkWell(
           borderRadius: BorderRadius.circular(12),
@@ -373,37 +370,25 @@ class _FeesSection extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        isPaidInFull
+                        allPaid
                             ? Icons.check_circle_outline
                             : Icons.receipt_long_outlined,
-                        color: isPaidInFull
+                        color: allPaid
                             ? theme.colorScheme.primary
                             : theme.colorScheme.error,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'fees.remaining'.tr(),
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.outline,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              isPaidInFull
-                                  ? 'fees.paidInFull'.tr()
-                                  : _formatCurrency(totalRemaining),
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: isPaidInFull
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.error,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          allPaid
+                              ? 'fees.paidInFull'.tr()
+                              : _formatCurrency(totalRemaining),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: allPaid
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.error,
+                          ),
                         ),
                       ),
                       Icon(
@@ -416,36 +401,16 @@ class _FeesSection extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: totalDue > 0
-                          ? (totalPaid / totalDue).clamp(0.0, 1.0)
-                          : 0,
+                      value: progress,
                       minHeight: 6,
                       backgroundColor:
                           theme.colorScheme.surfaceContainerHighest,
                       valueColor: AlwaysStoppedAnimation(
-                        isPaidInFull
+                        allPaid
                             ? theme.colorScheme.primary
                             : theme.colorScheme.error,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${'fees.totalPaid'.tr()}: ${_formatCurrency(totalPaid)}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.outline,
-                        ),
-                      ),
-                      Text(
-                        '${'fees.totalDue'.tr()}: ${_formatCurrency(totalDue)}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.outline,
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),

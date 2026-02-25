@@ -41,6 +41,32 @@ class Fee {
     };
   }
 
+  // ---------------------------------------------------------------------------
+  // Computed properties
+  // ---------------------------------------------------------------------------
+
+  double get due => double.tryParse(amountDue) ?? 0;
+  double get paid => double.tryParse(amountPaid) ?? 0;
+  double get debt => double.tryParse(previousDebt) ?? 0;
+
+  /// remaining = due - paid + previousDebt
+  /// A value <= 0 means nothing left to pay.
+  double get remaining => due - paid + debt;
+
+  /// Whether this semester's fee is fully settled (remaining <= 0).
+  bool get isPaid => remaining <= 0;
+
+  /// Progress value in [0.0, 1.0].
+  ///
+  /// Represents the fraction of the total obligation (due + previousDebt) that
+  /// has been covered:  (due - remaining) / (due + previousDebt).
+  /// When the total obligation is zero or negative, returns 1.0 (fully paid).
+  double get progress {
+    final total = due + debt;
+    if (total <= 0) return 1.0;
+    return ((due - remaining) / total).clamp(0.0, 1.0);
+  }
+
   /// Parses [dkhp] into a list of (subjectCode, credits) pairs.
   /// e.g. "IT004(5.0),IT005(5.0)" → [("IT004", "5.0"), ("IT005", "5.0")]
   List<({String code, String credits})> get subjects {

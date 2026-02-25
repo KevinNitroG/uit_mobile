@@ -52,15 +52,16 @@ class FeesScreen extends ConsumerWidget {
             );
           }
 
-          // Calculate totals.
-          final totalDue = fees.fold<double>(
-            0,
-            (sum, f) => sum + (double.tryParse(f.amountDue) ?? 0),
-          );
-          final totalPaid = fees.fold<double>(
-            0,
-            (sum, f) => sum + (double.tryParse(f.amountPaid) ?? 0),
-          );
+          // Aggregate totals using the model's computed properties.
+          final totalDue = fees.fold<double>(0, (s, f) => s + f.due);
+          final totalPaid = fees.fold<double>(0, (s, f) => s + f.paid);
+          final totalDebt = fees.fold<double>(0, (s, f) => s + f.debt);
+          final totalRemaining = totalDue - totalPaid + totalDebt;
+          final allPaid = totalRemaining <= 0;
+          final totalObligation = totalDue + totalDebt;
+          final totalProgress = totalObligation > 0
+              ? ((totalDue - totalRemaining) / totalObligation).clamp(0.0, 1.0)
+              : 1.0;
 
           return SelectionArea(
             child: RefreshIndicator(
@@ -75,6 +76,10 @@ class FeesScreen extends ConsumerWidget {
                     return _FeeSummaryCard(
                       totalDue: totalDue,
                       totalPaid: totalPaid,
+                      totalDebt: totalDebt,
+                      totalRemaining: totalRemaining,
+                      allPaid: allPaid,
+                      progress: totalProgress,
                     );
                   }
                   // Show most recent first.
@@ -90,18 +95,27 @@ class FeesScreen extends ConsumerWidget {
   }
 }
 
-/// Summary card at the top showing total due, paid, and remaining balance.
+/// Summary card at the top showing total due, paid, debt, and remaining.
 class _FeeSummaryCard extends StatelessWidget {
   final double totalDue;
   final double totalPaid;
+  final double totalDebt;
+  final double totalRemaining;
+  final bool allPaid;
+  final double progress;
 
-  const _FeeSummaryCard({required this.totalDue, required this.totalPaid});
+  const _FeeSummaryCard({
+    required this.totalDue,
+    required this.totalPaid,
+    required this.totalDebt,
+    required this.totalRemaining,
+    required this.allPaid,
+    required this.progress,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final remaining = totalDue - totalPaid;
-    final isPaidInFull = remaining <= 0;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -129,35 +143,33 @@ class _FeeSummaryCard extends StatelessWidget {
               value: _formatCurrency(totalPaid),
               color: theme.colorScheme.primary,
             ),
+            const SizedBox(height: 8),
+            _SummaryRow(
+              label: 'fees.totalPreviousDebt'.tr(),
+              value: _formatCurrency(totalDebt),
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
             const Divider(height: 20),
             _SummaryRow(
               label: 'fees.remaining'.tr(),
-              value: _formatCurrency(remaining),
-              color: isPaidInFull
+              value: _formatCurrency(totalRemaining),
+              color: allPaid
                   ? theme.colorScheme.primary
                   : theme.colorScheme.error,
               isBold: true,
             ),
-            if (isPaidInFull) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    Icons.check_circle,
-                    size: 16,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'fees.paidInFull'.tr(),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 6,
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                valueColor: AlwaysStoppedAnimation(
+                  allPaid ? theme.colorScheme.primary : theme.colorScheme.error,
+                ),
               ),
-            ],
+            ),
           ],
         ),
       ),
@@ -211,10 +223,6 @@ class _FeeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final due = double.tryParse(fee.amountDue) ?? 0;
-    final paid = double.tryParse(fee.amountPaid) ?? 0;
-    final previousDebt = double.tryParse(fee.previousDebt) ?? 0;
-    final isPaid = (due - paid) <= 0;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -223,7 +231,7 @@ class _FeeCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Semester / Year header
+            // Semester / Year header + status badge
             Row(
               children: [
                 Icon(
@@ -246,15 +254,15 @@ class _FeeCard extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: isPaid
+                    color: fee.isPaid
                         ? theme.colorScheme.primary.withValues(alpha: 0.12)
                         : theme.colorScheme.error.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    isPaid ? 'fees.paid'.tr() : 'fees.unpaid'.tr(),
+                    fee.isPaid ? 'fees.paid'.tr() : 'fees.unpaid'.tr(),
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: isPaid
+                      color: fee.isPaid
                           ? theme.colorScheme.primary
                           : theme.colorScheme.error,
                       fontWeight: FontWeight.w600,
@@ -264,44 +272,60 @@ class _FeeCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            // Amount details
+
+            // Amount details: Due, Paid, Previous Debt, Remaining
             Row(
               children: [
                 Expanded(
                   child: _AmountColumn(
                     label: 'fees.due'.tr(),
-                    value: _formatCurrency(due),
+                    value: _formatCurrency(fee.due),
                     color: theme.colorScheme.onSurface,
                   ),
                 ),
                 Expanded(
                   child: _AmountColumn(
                     label: 'fees.paidAmount'.tr(),
-                    value: _formatCurrency(paid),
+                    value: _formatCurrency(fee.paid),
                     color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: _AmountColumn(
+                    label: 'fees.previousDebtAmount'.tr(),
+                    value: _formatCurrency(fee.debt),
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Expanded(
                   child: _AmountColumn(
-                    label: 'fees.previousDebtAmount'.tr(),
-                    value: _formatCurrency(previousDebt),
-                    color: isPaid
+                    label: 'fees.remaining'.tr(),
+                    value: _formatCurrency(fee.remaining),
+                    color: fee.isPaid
                         ? theme.colorScheme.primary
                         : theme.colorScheme.error,
                   ),
                 ),
               ],
             ),
+
             // Progress bar
             const SizedBox(height: 10),
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
-                value: due > 0 ? (paid / due).clamp(0.0, 1.0) : 0,
+                value: fee.progress,
                 minHeight: 6,
                 backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 valueColor: AlwaysStoppedAnimation(
-                  isPaid ? theme.colorScheme.primary : theme.colorScheme.error,
+                  fee.isPaid
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.error,
                 ),
               ),
             ),
