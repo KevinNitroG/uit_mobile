@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.4...v1.0.5) (2026-02-25)
+
+
+### Bug Fixes
+
+* i18n debt ([ee933ba](https://github.com/KevinNitroG/uit_mobile/commit/ee933bac06f01c258c22ff5fa5419916258eb495))
+
 ## [1.0.4](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.3...v1.0.4) (2026-02-25)
 
 
