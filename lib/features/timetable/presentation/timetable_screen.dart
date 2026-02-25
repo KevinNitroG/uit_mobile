@@ -32,6 +32,11 @@ class TimetableScreen extends ConsumerWidget {
         title: Text('timetable.title'.tr()),
         actions: [
           IconButton(
+            icon: const Icon(Icons.event_note_outlined),
+            tooltip: 'timetable.ht2Title'.tr(),
+            onPressed: () => context.push('/ht2'),
+          ),
+          IconButton(
             icon: const Icon(Icons.info_outline),
             tooltip: 'timetable.periodInfo'.tr(),
             onPressed: () => context.push('/period-info'),
@@ -117,28 +122,39 @@ class _DayTabViewState extends State<_DayTabView>
 
     return Column(
       children: [
-        TabBar(
-          controller: _tabController,
-          isScrollable: false,
-          tabs: _allDays.map((day) {
-            final hasClasses =
-                widget.dayMap.containsKey(day) &&
-                widget.dayMap[day]!.isNotEmpty;
-            final isToday = day == todayUitDay;
-            return Tab(
-              child: Text(
-                _dayLabelKeys[day]?.tr() ?? day,
-                style: TextStyle(
-                  fontWeight: hasClasses ? FontWeight.bold : FontWeight.normal,
-                  color: isToday
-                      ? theme.colorScheme.tertiary
-                      : hasClasses
-                      ? null
-                      : theme.colorScheme.outline,
-                ),
-              ),
+        AnimatedBuilder(
+          animation: _tabController,
+          builder: (context, _) {
+            return TabBar(
+              controller: _tabController,
+              isScrollable: false,
+              tabs: _allDays.asMap().entries.map((entry) {
+                final index = entry.key;
+                final day = entry.value;
+                final hasClasses =
+                    widget.dayMap.containsKey(day) &&
+                    widget.dayMap[day]!.isNotEmpty;
+                final isToday = day == todayUitDay;
+                final isSelected = _tabController.index == index;
+
+                return Tab(
+                  child: Text(
+                    _dayLabelKeys[day]?.tr() ?? day,
+                    style: TextStyle(
+                      fontWeight: hasClasses
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isToday && !isSelected
+                          ? theme.colorScheme.tertiary
+                          : hasClasses
+                          ? null
+                          : theme.colorScheme.outline,
+                    ),
+                  ),
+                );
+              }).toList(),
             );
-          }).toList(),
+          },
         ),
         Expanded(
           child: TabBarView(

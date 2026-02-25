@@ -144,10 +144,6 @@ class _NotificationTileState extends State<_NotificationTile> {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ExpansionTile(
-        leading: Icon(
-          Icons.notifications_outlined,
-          color: theme.colorScheme.primary,
-        ),
         title: Text(
           widget.notification.title,
           style: theme.textTheme.bodyLarge?.copyWith(

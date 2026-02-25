@@ -10,6 +10,7 @@ import 'package:uit_mobile/features/notifications/presentation/notifications_scr
 import 'package:uit_mobile/features/scores/presentation/general_scores_screen.dart';
 import 'package:uit_mobile/features/settings/presentation/debug_screen.dart';
 import 'package:uit_mobile/features/settings/presentation/settings_screen.dart';
+import 'package:uit_mobile/features/timetable/presentation/ht2_screen.dart';
 import 'package:uit_mobile/features/timetable/presentation/period_info_screen.dart';
 import 'package:uit_mobile/shared/widgets/main_shell.dart';
 
@@ -103,6 +104,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'period-info',
             builder: (context, state) => const PeriodInfoScreen(),
           ),
+          GoRoute(path: 'ht2', builder: (context, state) => const HT2Screen()),
           GoRoute(
             path: 'fees',
             builder: (context, state) => const FeesScreen(),

@@ -2,6 +2,7 @@
 class Fee {
   final String amountDue; // phaidong
   final String amountPaid; // dadong
+  final String previousDebt; // notruoc
   final String semester; // hocky
   final String year; // namhoc
 
@@ -12,6 +13,7 @@ class Fee {
   const Fee({
     required this.amountDue,
     required this.amountPaid,
+    required this.previousDebt,
     required this.semester,
     required this.year,
     this.dkhp,
@@ -21,6 +23,7 @@ class Fee {
     return Fee(
       amountDue: json['phaidong'] as String? ?? '0',
       amountPaid: json['dadong'] as String? ?? '0',
+      previousDebt: json['notruoc'] as String? ?? '0',
       semester: json['hocky'] as String? ?? '',
       year: json['namhoc'] as String? ?? '',
       dkhp: json['dkhp'] as String?,
@@ -31,6 +34,7 @@ class Fee {
     return {
       'phaidong': amountDue,
       'dadong': amountPaid,
+      'notruoc': previousDebt,
       'hocky': semester,
       'namhoc': year,
       'dkhp': dkhp,

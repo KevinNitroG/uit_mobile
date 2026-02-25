@@ -213,10 +213,18 @@ class _QuickStats extends StatelessWidget {
               data: (semesters) {
                 // Sum all courses across all day groups.
                 var total = 0;
+                var totalCredits = 0;
+                final seenClasses = <String>{};
                 for (final s in semesters) {
                   total += s.courses.length;
+                  for (final c in s.courses) {
+                    // Avoid double-counting credits for same class across days
+                    if (seenClasses.add(c.classCode)) {
+                      totalCredits += int.tryParse(c.credits) ?? 0;
+                    }
+                  }
                 }
-                return '$total';
+                return '$total \u2022 $totalCredits TC';
               },
             ),
             theme: theme,

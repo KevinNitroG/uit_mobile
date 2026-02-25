@@ -61,7 +61,10 @@ class FeesScreen extends ConsumerWidget {
             0,
             (sum, f) => sum + (double.tryParse(f.amountPaid) ?? 0),
           );
-          final totalRemaining = totalDue - totalPaid;
+          final totalPreviousDebt = fees.fold<double>(
+            0,
+            (sum, f) => sum + (double.tryParse(f.previousDebt) ?? 0),
+          );
 
           return SelectionArea(
             child: RefreshIndicator(
@@ -76,7 +79,7 @@ class FeesScreen extends ConsumerWidget {
                     return _FeeSummaryCard(
                       totalDue: totalDue,
                       totalPaid: totalPaid,
-                      totalRemaining: totalRemaining,
+                      totalPreviousDebt: totalPreviousDebt,
                     );
                   }
                   // Show most recent first.
@@ -92,22 +95,22 @@ class FeesScreen extends ConsumerWidget {
   }
 }
 
-/// Summary card at the top showing total due, paid, and remaining.
+/// Summary card at the top showing total due, paid, and previous debt.
 class _FeeSummaryCard extends StatelessWidget {
   final double totalDue;
   final double totalPaid;
-  final double totalRemaining;
+  final double totalPreviousDebt;
 
   const _FeeSummaryCard({
     required this.totalDue,
     required this.totalPaid,
-    required this.totalRemaining,
+    required this.totalPreviousDebt,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isPaidInFull = totalRemaining <= 0;
+    final isPaidInFull = totalPreviousDebt <= 0;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -137,8 +140,8 @@ class _FeeSummaryCard extends StatelessWidget {
             ),
             const Divider(height: 20),
             _SummaryRow(
-              label: 'fees.remaining'.tr(),
-              value: _formatCurrency(totalRemaining.abs()),
+              label: 'fees.previousDebt'.tr(),
+              value: _formatCurrency(totalPreviousDebt),
               color: isPaidInFull
                   ? theme.colorScheme.primary
                   : theme.colorScheme.error,
@@ -219,8 +222,8 @@ class _FeeCard extends StatelessWidget {
     final theme = Theme.of(context);
     final due = double.tryParse(fee.amountDue) ?? 0;
     final paid = double.tryParse(fee.amountPaid) ?? 0;
-    final remaining = due - paid;
-    final isPaid = remaining <= 0;
+    final previousDebt = double.tryParse(fee.previousDebt) ?? 0;
+    final isPaid = previousDebt <= 0;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -289,8 +292,8 @@ class _FeeCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: _AmountColumn(
-                    label: 'fees.remainingAmount'.tr(),
-                    value: _formatCurrency(remaining.abs()),
+                    label: 'fees.previousDebtAmount'.tr(),
+                    value: _formatCurrency(previousDebt),
                     color: isPaid
                         ? theme.colorScheme.primary
                         : theme.colorScheme.error,

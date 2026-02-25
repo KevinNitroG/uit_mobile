@@ -27,21 +27,42 @@ Color _scoreColorBg(ThemeData theme, double? grade) {
 
 /// Calculate credit-weighted GPA for a list of scores.
 /// Excludes exempted courses (all weights=0, e.g. "Mien") and courses with
-/// non-numeric grades. Returns (gpa, totalCredits) or null if no valid scores.
-({double gpa, int totalCredits})? _calculateGpa(List<Score> scores) {
+/// non-numeric grades. Returns (gpa, creditsStudied, creditsAccumulated) or null if no valid scores.
+///
+/// - creditsStudied ("Tín chỉ đã học"): Sum of credits excluding "Miễn" courses.
+/// - creditsAccumulated ("Tín chỉ tích luỹ"): Sum of credits including "Miễn" courses.
+({double gpa, int creditsStudied, int creditsAccumulated})? _calculateGpa(
+  List<Score> scores,
+) {
   double weightedSum = 0;
-  int totalCredits = 0;
+  int creditsStudied = 0;
+  int creditsAccumulated = 0;
 
   for (final score in scores) {
-    if (!score.countsForGpa) continue;
-    final grade = double.parse(score.finalGrade!);
-    final credits = int.parse(score.credits);
+    final credits = int.tryParse(score.credits) ?? 0;
+    if (credits <= 0) continue;
+
+    // Accumulated credits include exempted ("Miễn") courses
+    if (score.isExempted) {
+      creditsAccumulated += credits;
+      continue;
+    }
+
+    final grade = double.tryParse(score.finalGrade ?? '');
+    if (grade == null) continue;
+
+    // Credits studied exclude exempted courses
+    creditsStudied += credits;
+    creditsAccumulated += credits;
     weightedSum += grade * credits;
-    totalCredits += credits;
   }
 
-  if (totalCredits == 0) return null;
-  return (gpa: weightedSum / totalCredits, totalCredits: totalCredits);
+  if (creditsStudied == 0 && creditsAccumulated == 0) return null;
+  return (
+    gpa: creditsStudied > 0 ? weightedSum / creditsStudied : 0,
+    creditsStudied: creditsStudied,
+    creditsAccumulated: creditsAccumulated,
+  );
 }
 
 /// Displays student scores grouped by semester with GPA calculations.
@@ -111,7 +132,7 @@ class ScoresScreen extends ConsumerWidget {
 
 /// Card showing the overall GPA summary at the top.
 class _OverallGpaCard extends StatelessWidget {
-  final ({double gpa, int totalCredits})? gpaResult;
+  final ({double gpa, int creditsStudied, int creditsAccumulated})? gpaResult;
 
   const _OverallGpaCard({required this.gpaResult});
 
@@ -137,13 +158,21 @@ class _OverallGpaCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  if (gpaResult != null)
+                  if (gpaResult != null) ...[
                     Text(
-                      '${gpaResult!.totalCredits} ${'scores.totalCredits'.tr().toLowerCase()}',
+                      '${'scores.creditsStudied'.tr()}: ${gpaResult!.creditsStudied}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.outline,
                       ),
                     ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${'scores.creditsAccumulated'.tr()}: ${gpaResult!.creditsAccumulated}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.outline,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -195,12 +224,18 @@ class _SemesterScoreCard extends StatelessWidget {
           subtitle: Row(
             children: [
               Text(
-                'scores.subjectCount'.tr(args: ['${semester.scores.length}']),
+                '${semester.scores.length} ${'scores.subjectCountShort'.tr()}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.outline,
                 ),
               ),
               if (semGpa != null) ...[
+                Text(
+                  ' \u2022 ${semGpa.creditsStudied} TC',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
+                ),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -212,7 +247,7 @@ class _SemesterScoreCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    '${semGpa.gpa.toStringAsFixed(2)} · ${semGpa.totalCredits} tc',
+                    semGpa.gpa.toStringAsFixed(2),
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: _scoreColor(theme, semGpa.gpa),
@@ -279,7 +314,7 @@ class _ScoreDetailTile extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          '${score.subjectCode} · ${score.credits} ${'scores.credits'.tr()}${score.subjectType.isNotEmpty ? ' · ${score.subjectType}' : ''}',
+          '${score.subjectCode} \u2022 ${score.credits} TC${score.subjectType.isNotEmpty ? ' \u2022 ${score.subjectType}' : ''}',
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.outline,
           ),

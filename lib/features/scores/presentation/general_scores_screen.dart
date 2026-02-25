@@ -23,22 +23,24 @@ Color _gradeColorBg(ThemeData theme, double? grade) =>
 // Column definitions
 // ---------------------------------------------------------------------------
 
-/// Flex ratios for each column. MAMH / LOP are wider; the rest share equally.
+/// Flex ratios for each column.
+/// Grouped ratio: MAMH(3) : LOP(6) : middle(2 each) : TB(3)
 const double _flexMAMH = 3;
 const double _flexLOP = 6;
-const double _flexRest = 2; // TC, QT, TH, GK, CK, TB
+const double _flexMid = 2; // TC, QT, TH, GK, CK
+const double _flexTB = 3; // TB (final grade) — wider for chip display
 
 const _headers = ['MAMH', 'LOP', 'TC', 'QT', 'TH', 'GK', 'CK', 'TB'];
 
 const _colFlex = <double>[
   _flexMAMH,
   _flexLOP,
-  _flexRest, // TC
-  _flexRest, // QT
-  _flexRest, // TH
-  _flexRest, // GK
-  _flexRest, // CK
-  _flexRest, // TB
+  _flexMid, // TC
+  _flexMid, // QT
+  _flexMid, // TH
+  _flexMid, // GK
+  _flexMid, // CK
+  _flexTB, // TB
 ];
 
 // ---------------------------------------------------------------------------
@@ -134,9 +136,15 @@ class _SemesterCard extends StatelessWidget {
           ),
 
           // ── Table ────────────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: _ScoreTable(scores: semester.scores),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 300, maxWidth: 800),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: _ScoreTable(scores: semester.scores),
+              ),
+            ),
           ),
 
           const SizedBox(height: 4),
@@ -165,23 +173,20 @@ class _ScoreTable extends StatelessWidget {
       for (var i = 0; i < _colFlex.length; i++) i: FlexColumnWidth(_colFlex[i]),
     };
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 600),
-      child: Table(
-        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-        columnWidths: colWidths,
-        children: [
-          // Header row
-          _buildHeaderRow(theme, cs),
-          // Divider after header
-          _buildDividerRow(cs, bold: true),
-          // Data rows
-          for (var i = 0; i < scores.length; i++) ...[
-            _buildDataRow(theme, cs, scores[i], isEven: i.isEven),
-            _buildDividerRow(cs),
-          ],
+    return Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      columnWidths: colWidths,
+      children: [
+        // Header row
+        _buildHeaderRow(theme, cs),
+        // Divider after header
+        _buildDividerRow(cs, bold: true),
+        // Data rows
+        for (var i = 0; i < scores.length; i++) ...[
+          _buildDataRow(theme, cs, scores[i], isEven: i.isEven),
+          _buildDividerRow(cs),
         ],
-      ),
+      ],
     );
   }
 
