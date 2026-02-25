@@ -61,10 +61,6 @@ class FeesScreen extends ConsumerWidget {
             0,
             (sum, f) => sum + (double.tryParse(f.amountPaid) ?? 0),
           );
-          final totalPreviousDebt = fees.fold<double>(
-            0,
-            (sum, f) => sum + (double.tryParse(f.previousDebt) ?? 0),
-          );
 
           return SelectionArea(
             child: RefreshIndicator(
@@ -79,7 +75,6 @@ class FeesScreen extends ConsumerWidget {
                     return _FeeSummaryCard(
                       totalDue: totalDue,
                       totalPaid: totalPaid,
-                      totalPreviousDebt: totalPreviousDebt,
                     );
                   }
                   // Show most recent first.
@@ -95,22 +90,18 @@ class FeesScreen extends ConsumerWidget {
   }
 }
 
-/// Summary card at the top showing total due, paid, and previous debt.
+/// Summary card at the top showing total due, paid, and remaining balance.
 class _FeeSummaryCard extends StatelessWidget {
   final double totalDue;
   final double totalPaid;
-  final double totalPreviousDebt;
 
-  const _FeeSummaryCard({
-    required this.totalDue,
-    required this.totalPaid,
-    required this.totalPreviousDebt,
-  });
+  const _FeeSummaryCard({required this.totalDue, required this.totalPaid});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isPaidInFull = totalPreviousDebt <= 0;
+    final remaining = totalDue - totalPaid;
+    final isPaidInFull = remaining <= 0;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -140,8 +131,8 @@ class _FeeSummaryCard extends StatelessWidget {
             ),
             const Divider(height: 20),
             _SummaryRow(
-              label: 'fees.previousDebt'.tr(),
-              value: _formatCurrency(totalPreviousDebt),
+              label: 'fees.remaining'.tr(),
+              value: _formatCurrency(remaining),
               color: isPaidInFull
                   ? theme.colorScheme.primary
                   : theme.colorScheme.error,
@@ -223,7 +214,7 @@ class _FeeCard extends StatelessWidget {
     final due = double.tryParse(fee.amountDue) ?? 0;
     final paid = double.tryParse(fee.amountPaid) ?? 0;
     final previousDebt = double.tryParse(fee.previousDebt) ?? 0;
-    final isPaid = previousDebt <= 0;
+    final isPaid = (due - paid) <= 0;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
