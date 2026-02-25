@@ -55,7 +55,6 @@ class FeesScreen extends ConsumerWidget {
           // Aggregate totals using the model's computed properties.
           final totalDue = fees.fold<double>(0, (s, f) => s + f.due);
           final totalPaid = fees.fold<double>(0, (s, f) => s + f.paid);
-          final totalDebt = fees.fold<double>(0, (s, f) => s + f.debt);
           final totalRemaining = fees.fold<double>(
             0,
             (s, f) => s + f.remaining,
@@ -78,7 +77,6 @@ class FeesScreen extends ConsumerWidget {
                     return _FeeSummaryCard(
                       totalDue: totalDue,
                       totalPaid: totalPaid,
-                      totalDebt: totalDebt,
                       totalRemaining: totalRemaining,
                       allPaid: allPaid,
                       progress: totalProgress,
@@ -97,11 +95,10 @@ class FeesScreen extends ConsumerWidget {
   }
 }
 
-/// Summary card at the top showing total due, paid, debt, and remaining.
+/// Summary card at the top showing total due, paid, and remaining.
 class _FeeSummaryCard extends StatelessWidget {
   final double totalDue;
   final double totalPaid;
-  final double totalDebt;
   final double totalRemaining;
   final bool allPaid;
   final double progress;
@@ -109,7 +106,6 @@ class _FeeSummaryCard extends StatelessWidget {
   const _FeeSummaryCard({
     required this.totalDue,
     required this.totalPaid,
-    required this.totalDebt,
     required this.totalRemaining,
     required this.allPaid,
     required this.progress,
@@ -144,12 +140,6 @@ class _FeeSummaryCard extends StatelessWidget {
               label: 'fees.totalPaid'.tr(),
               value: _formatCurrency(totalPaid),
               color: theme.colorScheme.primary,
-            ),
-            const SizedBox(height: 8),
-            _SummaryRow(
-              label: 'fees.totalPreviousDebt'.tr(),
-              value: _formatCurrency(totalDebt),
-              color: theme.colorScheme.onSurfaceVariant,
             ),
             const Divider(height: 20),
             _SummaryRow(

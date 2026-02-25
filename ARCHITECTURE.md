@@ -42,12 +42,12 @@ uit-mobile/
 │   │   │   ├── models.dart                # Barrel file exporting all models
 │   │   │   ├── user_session.dart          # UserSession: studentId, encodedCredentials, token, encodedToken, tokenExpiry, name, avatarHash
 │   │   │   ├── user_info.dart             # UserInfo: name, sid, mail, status, course, major, dob, role, className, address, avatar
-│   │   │   ├── course.dart                # Course (classCode, room, lecturer, dayOfWeek, periods) + Semester (day group)
+│   │   │   ├── course.dart                # Course (classCode, room, lecturer, dayOfWeek, periods) + Semester + TeachingFormat enum (lt/ht2/tttn/kltn)
 │   │   │   ├── score.dart                 # Score (grades, weights, isExempted, countsForGpa) + ScoreSemester
 │   │   │   ├── exam.dart                  # Exam: parsed from flat API map, getters for date/room/time/subjectName/subjectCode via regex
 │   │   │   ├── fee.dart                   # Fee: amountDue, amountPaid, semester, year, dkhp; getter for parsed subjects
 │   │   │   ├── notification.dart          # UitNotification: id, title, content, dated
-│   │   │   ├── deadline.dart              # Deadline: shortname, name, niceDate, status (pending/overdue/submitted), closed
+│   │   │   ├── deadline.dart              # Deadline: shortname, name, niceDate, status (pending/overdue/submitted), closed, cmid, url getter
 │   │   │   └── student_data.dart          # StudentData: raw JSON wrapper (coursesRaw, scoresRaw, feeRaw, notifyRaw, deadlineRaw, examsRaw)
 │   │   └── widgets/
 │   │       └── main_shell.dart            # MainShell: 5-tab bottom nav (Home, TKB, Deadlines, Exams, Scores)
@@ -70,6 +70,7 @@ uit-mobile/
 │       ├── timetable/
 │       │   └── presentation/
 │       │       ├── timetable_screen.dart  # TabBar day navigation (Mon-Sun), today indicated with circled border, swipeable
+│       │       ├── ht2_screen.dart        # HT2/TTTN/KLTN classes with color-coded badges and meeting schedules
 │       │       └── period_info_screen.dart # All 10 UIT periods with time ranges; morning=blue, afternoon=teal; current period highlighted with colored border
 │       │
 │       ├── deadlines/
@@ -87,8 +88,7 @@ uit-mobile/
 │       │
 │       ├── fees/
 │       │   └── presentation/
-│       │       └── fees_screen.dart       # Fee summary (total due/paid/remaining) + per-semester cards with progress bars and registered subjects
-│       │
+│       │       └── fees_screen.dart       # Fee summary (total due/paid/remaining) + per-semester cards with progress bars and registered subjects│       │
 │       ├── notifications/
 │       │   └── presentation/
 │       │       └── notifications_screen.dart # Search/filter notifications, expandable tiles
@@ -96,7 +96,8 @@ uit-mobile/
 │       └── settings/
 │           └── presentation/
 │               ├── settings_screen.dart   # Language (VI/EN), account management, logout with confirmation
-│               └── debug_screen.dart      # Raw JSON API data viewer with copy buttons
+│               ├── debug_screen.dart      # Raw JSON API data viewer with copy buttons
+│               └── debug_json_screen.dart # Per-section JSON detail: raw text (default) + tree view toggle
 │
 ├── assets/
 │   ├── translations/
@@ -178,6 +179,7 @@ uit-mobile/
 
 - **Dio 5.9.1** - HTTP client with interceptor support
 - Custom `JwtInterceptor` for auto-refresh on 401, request queuing
+- **url_launcher 6.3.2** - Opens external URLs (Moodle assignment pages) in system browser
 
 ### Routing
 
@@ -206,6 +208,10 @@ uit-mobile/
 - **json_serializable 6.13.0** - Generate `fromJson`/`toJson` methods
 - **flutter_lints 6.0.0** - Dart linting rules
 
+### UI Enhancement
+
+- **flutter_json_view** - Interactive, collapsible JSON tree viewer used in the debug screen
+
 ---
 
 ## Routing Configuration
@@ -229,6 +235,7 @@ uit-mobile/
   ├─ /settings (SettingsScreen)
   ├─ /period-info (PeriodInfoScreen)
   ├─ /fees (FeesScreen)
+  ├─ /ht2 (HT2Screen)
   ├─ /scores/general (GeneralScoresScreen)
   └─ /debug (DebugScreen)
 ```
@@ -315,7 +322,7 @@ uit-mobile/
 ### Home Screen (`lib/features/home/presentation/home_screen.dart`)
 
 - **App Bar**: Refresh, Notifications (→ /notifications), Settings (→ /settings)
-- **Profile Card**: Avatar (first letter), name, student ID, major, class, email, DOB
+- **Profile Card**: Avatar (first letter), name, student ID, major, class, email, DOB, address (if non-empty)
 - **Overview Section**: Course count (total across all days), Deadline count as `remaining/total` (where remaining = total - submitted)
 - **Tuition Fees Section**: Summary card showing remaining amount, progress bar, paid/due totals; tappable to navigate to /fees
 
@@ -326,6 +333,14 @@ uit-mobile/
 - **Day Mapping**: Dart weekday (1=Mon) → UIT code (+1); initial tab = today
 - **Course Tiles**: Period badge (primaryContainer), class code, room, lecturer name
 - **App Bar Action**: Period Info button (→ /period-info)
+- **App Bar Action**: HT2/TTTN/KLTN button (→ /ht2) — opens the non-lecture classes screen
+
+### HT2 Screen (`lib/features/timetable/presentation/ht2_screen.dart`)
+
+- **Title**: "HT2 - TTTN - KLTN" (i18n key `timetable.ht2Title`)
+- **Course Tiles**: Class code, subject name, credits, department, date range, lecturers
+- **Teaching Format Badge**: Color-coded by `TeachingFormat` enum — HT2 (teal/tertiary), TTTN (secondary), KLTN (error/red)
+- **Meeting Schedule**: Displays `ht2_lichgapsv` if available, otherwise shows "No meeting schedule yet"
 
 ### Period Info Screen (`lib/features/timetable/presentation/period_info_screen.dart`)
 
@@ -339,6 +354,7 @@ uit-mobile/
 - **Filter Chips**: All, Pending, Finished, Overdue
 - **Status Icons**: check_circle (green/submitted), assignment_late (red/overdue), assignment (orange/pending)
 - **Additional Badges**: "Closed" if submission closed
+- **Tap to Open**: Clicking a deadline with a `cmid` shows a confirmation dialog to open the Moodle assignment URL in the external browser (via `url_launcher`)
 
 ### Exams Screen (`lib/features/exams/presentation/exams_screen.dart`)
 
@@ -365,8 +381,8 @@ uit-mobile/
 
 ### Fees Screen (`lib/features/fees/presentation/fees_screen.dart`)
 
-- **Summary Card**: Total due, total paid, remaining (green if paid, red if not), check mark if fully paid
-- **Per-Fee Cards**: Semester label, paid/unpaid badge, three amount columns, progress bar
+- **Summary Card**: Total due, total paid, remaining (green if paid, red if not), progress bar
+- **Per-Fee Cards**: Semester label, paid/unpaid badge, amount columns (due, paid, previous debt, remaining), progress bar
 - **Registered Subjects**: Tags parsed from dkhp (code + credits)
 - **Currency**: VND formatted with thousands separator
 
@@ -386,6 +402,7 @@ uit-mobile/
 
 - **Raw JSON Viewer**: Expandable sections for Courses, Scores, Fees, Notifications, Deadlines, Exams
 - **Copy Buttons**: Per-section and copy-all in app bar
+- **Detail View** (`debug_json_screen.dart`): Default shows raw pretty-printed JSON text (monospace); toggle button switches to interactive collapsible tree view (via `flutter_json_view`)
 
 ---
 
@@ -397,9 +414,13 @@ uit-mobile/
 ### UserInfo
 - `name`, `sid`, `mail`, `status`, `course`, `major`, `dob`, `role`, `className`, `address`, `avatar`
 
-### Course + Semester
-- Course: `id`, `classCode`, `room`, `lecturerName`, `lecturerEmail`, `department`, `dayOfWeek`, `periods`
-- Semester: `name` (UIT day code '2'-'8'), `courses` (list)
+### Course + Semester + TeachingFormat
+- **TeachingFormat** (enum): `lt` (LT), `ht2` (HT2), `tttn` (TTTN), `kltn` (KLTN); parsed from API field `hinhthucgd`
+  - Each value provides: `label`, `badgeColor(cs)`, `badgeTextColor(cs)`, `isNonLecture`
+  - LT uses primaryContainer, HT2 uses tertiaryContainer, TTTN uses secondaryContainer, KLTN uses errorContainer
+- Course: `id`, `classCode`, `room`, `lecturerName`, `lecturerEmail`, `department`, `dayOfWeek`, `periods`, `subjectCode`, `subjectName`, `credits`, `totalCredits`, `teachingFormat`, `format` (TeachingFormat enum), `ht2Schedule`, `startDate`, `endDate`, `lecturers`
+  - `isHT2` getter: `format != null && format!.isNonLecture` (covers HT2, TTTN, KLTN)
+- Semester: `name` (UIT day code '2'-'8', or `"HT2/TTTN/KLTN"` for non-lecture groups), `courses` (list)
 
 ### Score + ScoreSemester
 - Score: `subjectCode`, `classCode`, `semester`, `year`, `credits`, `subjectName`, `subjectType`, `finalGrade`, `grade1-4`, `weight1-4`
@@ -415,8 +436,9 @@ uit-mobile/
 - Getter: `subjects` (parsed from dkhp into code+credits pairs)
 
 ### Deadline
-- `shortname`, `name`, `niceDate`, `status` (pending/overdue/submitted), `closed`
-- Status mapping: null→pending, "new"→overdue, "submitted"→submitted
+- `cmid` (int?, Moodle course-module ID), `shortname`, `name`, `niceDate`, `status` (pending/overdue/submitted), `closed`
+- `url` getter: builds `https://courses.uit.edu.vn/mod/assign/view.php?id={cmid}` (null if cmid absent)
+- Status mapping: null->pending, "new"->overdue, "submitted"->submitted
 
 ### UitNotification
 - `id`, `title`, `content`, `dated`

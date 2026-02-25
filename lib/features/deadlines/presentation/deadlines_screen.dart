@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Filter mode for deadlines.
 enum DeadlineFilter { all, pending, finished, overdue }
@@ -137,6 +138,33 @@ class _DeadlineTile extends StatelessWidget {
 
   const _DeadlineTile({required this.deadline});
 
+  Future<void> _showOpenUrlDialog(BuildContext context) async {
+    final url = deadline.url;
+    if (url == null) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('deadlines.openWebsite'.tr()),
+        content: Text(url),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('deadlines.open'.tr()),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -163,60 +191,64 @@ class _DeadlineTile extends StatelessWidget {
       ),
     };
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(icon, color: color),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(deadline.name, style: theme.textTheme.bodyLarge),
-                  const SizedBox(height: 2),
-                  Text(
-                    deadline.shortname,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.outline,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.schedule,
-                        size: 14,
-                        color: theme.colorScheme.secondary,
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: deadline.url != null ? () => _showOpenUrlDialog(context) : null,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(icon, color: color),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(deadline.name, style: theme.textTheme.bodyLarge),
+                    const SizedBox(height: 2),
+                    Text(
+                      deadline.shortname,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.outline,
                       ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          deadline.niceDate,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.secondary,
-                            fontWeight: FontWeight.w500,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.schedule,
+                          size: 14,
+                          color: theme.colorScheme.secondary,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            deadline.niceDate,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.secondary,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      _StatusBadge(label: badgeKey.tr(), color: color),
-                      if (deadline.closed) ...[
-                        const SizedBox(width: 6),
-                        _StatusBadge(
-                          label: 'deadlines.closed'.tr(),
-                          color: theme.colorScheme.outline,
-                        ),
+                        const SizedBox(width: 8),
+                        _StatusBadge(label: badgeKey.tr(), color: color),
+                        if (deadline.closed) ...[
+                          const SizedBox(width: 6),
+                          _StatusBadge(
+                            label: 'deadlines.closed'.tr(),
+                            color: theme.colorScheme.outline,
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

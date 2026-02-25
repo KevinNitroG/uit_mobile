@@ -24,6 +24,7 @@
     "class": "Lớp",
     "email": "Email",
     "dob": "Ngày sinh",
+    "address": "Địa chỉ",
     "courses": "Môn học",
     "deadlines": "Deadline"
   },
@@ -43,7 +44,7 @@
     "noCourses": "Không có môn học nào",
     "period": "Tiết {}",
     "periodInfo": "Chi tiết tiết học",
-    "ht2Title": "Lớp HT2",
+    "ht2Title": "HT2 - TTTN - KLTN",
     "noHt2Courses": "Không có lớp HT2",
     "ht2MeetingSchedule": "Lịch gặp sinh viên",
     "ht2NoScheduleYet": "Chưa có lịch gặp",
@@ -67,7 +68,9 @@
     "submitted": "Đã nộp",
     "pending": "Còn chờ",
     "overdue": "Quá hạn",
-    "closed": "Đã đóng"
+    "closed": "Đã đóng",
+    "openWebsite": "Mở trang web",
+    "open": "Mở"
   },
   "scores": {
     "title": "Điểm",
@@ -124,6 +127,8 @@
     "debugSubtitle": "Xem dữ liệu API thô",
     "debugCopy": "Sao chép toàn bộ JSON",
     "debugCopied": "Đã sao chép JSON",
+    "debugRawView": "Xem JSON thô",
+    "debugTreeView": "Xem dạng cây",
     "updateAvailableTitle": "Có bản cập nhật mới",
     "updateAvailableMessage": "Phiên bản mới {} đã có. Bạn có muốn tải về không?",
     "updateDownload": "Tải về",

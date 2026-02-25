@@ -24,6 +24,7 @@
     "class": "Class",
     "email": "Email",
     "dob": "DOB",
+    "address": "Address",
     "courses": "Courses",
     "deadlines": "Deadlines"
   },
@@ -43,7 +44,7 @@
      "noCourses": "No courses found",
      "period": "Period {}",
      "periodInfo": "Period Info",
-     "ht2Title": "HT2 Classes",
+      "ht2Title": "HT2 - TTTN - KLTN",
      "noHt2Courses": "No HT2 classes found",
      "ht2MeetingSchedule": "Meeting Schedule",
      "ht2NoScheduleYet": "No meeting schedule yet",
@@ -67,7 +68,9 @@
     "submitted": "Submitted",
     "pending": "Pending",
     "overdue": "Overdue",
-    "closed": "Closed"
+    "closed": "Closed",
+    "openWebsite": "Open Website",
+    "open": "Open"
   },
   "scores": {
     "title": "Scores",
@@ -125,6 +128,8 @@
     "debugCopy": "Copy all JSON",
     "debugCopied": "JSON copied to clipboard",
     "debugFullResponse": "Full API Response",
+    "debugRawView": "Raw JSON view",
+    "debugTreeView": "Tree view",
     "updateAvailableTitle": "Update Available",
     "updateAvailableMessage": "A new version {} is available. Would you like to download it?",
     "updateDownload": "Download",

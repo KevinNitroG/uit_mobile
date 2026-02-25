@@ -151,6 +151,8 @@ class _ProfileCard extends StatelessWidget {
               _InfoRow(label: 'home.class'.tr(), value: user.className),
               _InfoRow(label: 'home.email'.tr(), value: user.mail),
               _InfoRow(label: 'home.dob'.tr(), value: user.dob),
+              if (user.address.isNotEmpty)
+                _InfoRow(label: 'home.address'.tr(), value: user.address),
             ],
           ),
         ),

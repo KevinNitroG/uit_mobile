@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
-/// Screen showing all HT2 (Hình thức 2) classes.
+/// Screen showing all HT2/TTTN/KLTN classes.
 ///
-/// HT2 classes have dynamic schedules (no fixed day/period) and are grouped
+/// These classes have dynamic schedules (no fixed day/period) and are grouped
 /// separately from the regular timetable. Their meeting times are specified
 /// in [Course.ht2Schedule].
 class HT2Screen extends ConsumerWidget {
@@ -91,6 +91,7 @@ class _HT2CourseTile extends StatelessWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final credits = course.totalCredits ?? course.credits;
+    final format = course.format ?? TeachingFormat.ht2;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -99,7 +100,7 @@ class _HT2CourseTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: class code + HT2 badge
+            // Header: class code + teaching format badge
             Row(
               children: [
                 Expanded(
@@ -131,14 +132,14 @@ class _HT2CourseTile extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: cs.tertiaryContainer,
+                    color: format.badgeColor(cs),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    'HT2',
+                    format.label,
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: cs.onTertiaryContainer,
+                      color: format.badgeTextColor(cs),
                     ),
                   ),
                 ),
