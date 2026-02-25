@@ -137,20 +137,20 @@
     "remove": "Xóa",
     "refresh": "Làm mới"
   },
-  "fees": {
-    "title": "Học phí",
-    "noFees": "Không có dữ liệu học phí",
-    "summary": "Tổng quan",
-    "totalDue": "Tổng phải đóng",
-    "totalPaid": "Đã đóng",
-    "previousDebt": "Nợ trước",
-    "paidInFull": "Đã đóng đủ",
-    "paid": "Đã đóng",
-    "unpaid": "Chưa đóng",
-    "due": "Phải đóng",
-    "paidAmount": "Đã đóng",
-    "previousDebtAmount": "Nợ trước",
-    "semesterLabel": "Học kỳ {} - {}",
-    "registeredSubjects": "Môn đăng ký"
-  }
+   "fees": {
+     "title": "Học phí",
+     "noFees": "Không có dữ liệu học phí",
+     "summary": "Tổng quan",
+     "totalDue": "Tổng phải đóng",
+     "totalPaid": "Đã đóng",
+     "remaining": "Còn phải đóng",
+     "paidInFull": "Đã đóng đủ",
+     "paid": "Đã đóng",
+     "unpaid": "Chưa đóng",
+     "due": "Phải đóng",
+     "paidAmount": "Đã đóng",
+     "previousDebtAmount": "Nợ trước",
+     "semesterLabel": "Học kỳ {} - {}",
+     "registeredSubjects": "Môn đăng ký"
+   }
 }

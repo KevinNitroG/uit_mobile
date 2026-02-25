@@ -137,20 +137,20 @@
     "remove": "Remove",
     "refresh": "Refresh"
   },
-  "fees": {
-    "title": "Tuition Fees",
-    "noFees": "No fee records found",
-    "summary": "Summary",
-    "totalDue": "Total Due",
-    "totalPaid": "Total Paid",
-    "previousDebt": "Previous Debt",
-    "paidInFull": "Paid in full",
-    "paid": "Paid",
-    "unpaid": "Unpaid",
-    "due": "Due",
-    "paidAmount": "Paid",
-    "previousDebtAmount": "Previous Debt",
-    "semesterLabel": "Semester {} - {}",
-    "registeredSubjects": "Registered Subjects"
-  }
+   "fees": {
+     "title": "Tuition Fees",
+     "noFees": "No fee records found",
+     "summary": "Summary",
+     "totalDue": "Total Due",
+     "totalPaid": "Total Paid",
+     "remaining": "Remaining",
+     "paidInFull": "Paid in full",
+     "paid": "Paid",
+     "unpaid": "Unpaid",
+     "due": "Due",
+     "paidAmount": "Paid",
+     "previousDebtAmount": "Previous Debt",
+     "semesterLabel": "Semester {} - {}",
+     "registeredSubjects": "Registered Subjects"
+   }
 }
