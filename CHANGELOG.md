@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.6...v1.1.0) (2026-02-25)
+
+
+### Features
+
+* improve home screen UX and add debug JSON viewer ([bb35bfa](https://github.com/KevinNitroG/uit_mobile/commit/bb35bfa9bbb062fc5fbdb56b92698011c3783162))
+
+
+### Bug Fixes
+
+* pending is con cho, fee screen rewrite? ([b5ee98c](https://github.com/KevinNitroG/uit_mobile/commit/b5ee98c3e35caca761521df5510630e138dc2876))
+* restore previousDebt in remaining calc and fix home fee card overflow ([d9a5dbf](https://github.com/KevinNitroG/uit_mobile/commit/d9a5dbf85c077d018ddfe4904031e005d310e0e2))
+* simplify fee remaining to max(due - paid, 0) and theme debug JSON view ([dadf8a8](https://github.com/KevinNitroG/uit_mobile/commit/dadf8a8c87ece087a61d6c679c2a53e6b0426231))
+
 ## [1.0.6](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.5...v1.0.6) (2026-02-25)
 
 
