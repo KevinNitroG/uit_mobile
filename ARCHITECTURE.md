@@ -47,7 +47,7 @@ uit-mobile/
 │   │   │   ├── exam.dart                  # Exam: parsed from flat API map, getters for date/room/time/subjectName/subjectCode via regex
 │   │   │   ├── fee.dart                   # Fee: amountDue, amountPaid, semester, year, dkhp; getter for parsed subjects
 │   │   │   ├── notification.dart          # UitNotification: id, title, content, dated
-│   │   │   ├── deadline.dart              # Deadline: shortname, name, niceDate, status (pending/overdue/submitted), closed, cmid, url getter
+│   │   │   ├── deadline.dart              # Deadline: shortname, name, niceDate, status (pending/overdue/submitted), closed, id, url getter
 │   │   │   └── student_data.dart          # StudentData: raw JSON wrapper (coursesRaw, scoresRaw, feeRaw, notifyRaw, deadlineRaw, examsRaw)
 │   │   └── widgets/
 │   │       └── main_shell.dart            # MainShell: 5-tab bottom nav (Home, TKB, Deadlines, Exams, Scores)
@@ -354,7 +354,7 @@ uit-mobile/
 - **Filter Chips**: All, Pending, Finished, Overdue
 - **Status Icons**: check_circle (green/submitted), assignment_late (red/overdue), assignment (orange/pending)
 - **Additional Badges**: "Closed" if submission closed
-- **Tap to Open**: Clicking a deadline with a `cmid` shows a confirmation dialog to open the Moodle assignment URL in the external browser (via `url_launcher`)
+- **Tap to Open**: Clicking a deadline with a `id` shows a confirmation dialog to open the Moodle assignment URL in the external browser (via `url_launcher`)
 
 ### Exams Screen (`lib/features/exams/presentation/exams_screen.dart`)
 
@@ -436,8 +436,8 @@ uit-mobile/
 - Getter: `subjects` (parsed from dkhp into code+credits pairs)
 
 ### Deadline
-- `cmid` (int?, Moodle course-module ID), `shortname`, `name`, `niceDate`, `status` (pending/overdue/submitted), `closed`
-- `url` getter: builds `https://courses.uit.edu.vn/mod/assign/view.php?id={cmid}` (null if cmid absent)
+- `id` (int?, Moodle course-module ID), `shortname`, `name`, `niceDate`, `status` (pending/overdue/submitted), `closed`
+- `url` getter: builds `https://courses.uit.edu.vn/mod/assign/view.php?id={id}` (null if id absent)
 - Status mapping: null->pending, "new"->overdue, "submitted"->submitted
 
 ### UitNotification

@@ -39,7 +39,7 @@ bool _parseBool(dynamic value) {
 /// A deadline/assignment entry.
 class Deadline {
   /// Moodle course-module ID — comes from the `id` field in the API response.
-  final int cmid;
+  final int id;
 
   final String shortname;
   final String name;
@@ -50,7 +50,7 @@ class Deadline {
   final bool closed;
 
   const Deadline({
-    required this.cmid,
+    required this.id,
     required this.shortname,
     required this.name,
     required this.niceDate,
@@ -59,11 +59,11 @@ class Deadline {
   });
 
   /// URL to the assignment on the Moodle courses site.
-  String get url => 'https://courses.uit.edu.vn/mod/assign/view.php?id=$cmid';
+  String get url => 'https://courses.uit.edu.vn/mod/assign/view.php?id=$id';
 
   factory Deadline.fromJson(Map<String, dynamic> json) {
     return Deadline(
-      cmid: int.parse(json['id'].toString()),
+      id: int.parse(json['id'].toString()),
       shortname: json['shortname'] as String? ?? '',
       name: json['name'] as String? ?? '',
       niceDate: json['niceDate'] as String? ?? '',
@@ -74,7 +74,7 @@ class Deadline {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': cmid,
+      'id': id,
       'shortname': shortname,
       'name': name,
       'niceDate': niceDate,
