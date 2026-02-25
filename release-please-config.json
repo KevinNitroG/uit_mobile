@@ -5,7 +5,10 @@
       "release-type": "dart",
       "include-component-in-tag": false,
       "extra-files": [
-        "lib/features/settings/providers/update_check_provider.dart"
+        {
+          "type": "generic",
+          "path": "lib/features/settings/providers/update_check_provider.dart"
+        }
       ],
       "changelog-sections": [
         { "type": "feat", "section": "Features" },
