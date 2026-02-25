@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.3](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.2...v1.0.3) (2026-02-25)
+
+
+### Bug Fixes
+
+* version tracked by release please ([7fc8ea6](https://github.com/KevinNitroG/uit_mobile/commit/7fc8ea68c1029e72ec2b2f0933b947aa2ec7fa51))
+
+
+### Refactoring
+
+* use notruoc from API directly for previous debt instead of computing remaining ([7a8d211](https://github.com/KevinNitroG/uit_mobile/commit/7a8d211aa930cbaac73ebb6ae56dee7c49d1cba9))
+
 ## [1.0.2](https://github.com/KevinNitroG/uit_mobile/compare/v1.0.1...v1.0.2) (2026-02-24)
 
 
