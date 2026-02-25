@@ -195,21 +195,23 @@ class _ScoreTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surfaceContainerHighest.withValues(alpha: 0.5),
       ),
-      children: _headers
-          .map(
-            (h) => _Cell(
-              child: Text(
-                h,
-                textAlign: TextAlign.left,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: cs.onSurfaceVariant,
-                  letterSpacing: 0.5,
-                ),
-              ),
+      children: _headers.asMap().entries.map((entry) {
+        final index = entry.key;
+        final h = entry.value;
+        // First 2 headers (MAMH, LOP) are left-aligned; rest are centered
+        final alignment = index < 2 ? TextAlign.left : TextAlign.center;
+        return _Cell(
+          child: Text(
+            h,
+            textAlign: alignment,
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: cs.onSurfaceVariant,
+              letterSpacing: 0.5,
             ),
-          )
-          .toList(),
+          ),
+        );
+      }).toList(),
     );
   }
 
