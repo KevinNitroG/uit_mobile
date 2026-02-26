@@ -332,43 +332,38 @@ class _StatCard extends StatelessWidget {
   final String label;
   final String value;
   final ThemeData theme;
-  final VoidCallback? onTap;
 
   const _StatCard({
     required this.icon,
     required this.label,
     required this.value,
     required this.theme,
-    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Icon(icon, color: theme.colorScheme.primary),
-              const SizedBox(height: 8),
-              Text(
-                value,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Icon(icon, color: theme.colorScheme.primary),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.outline,
-                ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
