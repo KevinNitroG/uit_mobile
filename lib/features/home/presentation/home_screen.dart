@@ -119,8 +119,25 @@ class _ProfileCard extends StatefulWidget {
   State<_ProfileCard> createState() => _ProfileCardState();
 }
 
-class _ProfileCardState extends State<_ProfileCard> {
+class _ProfileCardState extends State<_ProfileCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
   bool _expanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +148,14 @@ class _ProfileCardState extends State<_ProfileCard> {
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () => setState(() => _expanded = !_expanded),
+          onTap: () {
+            setState(() => _expanded = !_expanded);
+            if (_expanded) {
+              _controller.forward();
+            } else {
+              _controller.reverse();
+            }
+          },
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -176,28 +200,24 @@ class _ProfileCardState extends State<_ProfileCard> {
                     ),
                   ],
                 ),
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
+                SizeTransition(
+                  sizeFactor: CurvedAnimation(
+                    parent: _controller,
+                    curve: Curves.easeInOut,
+                  ),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (_expanded) ...[
-                        const Divider(height: 24),
-                        _InfoRow(label: 'home.major'.tr(), value: user.major),
+                      const Divider(height: 24),
+                      _InfoRow(label: 'home.major'.tr(), value: user.major),
+                      _InfoRow(label: 'home.class'.tr(), value: user.className),
+                      _InfoRow(label: 'home.email'.tr(), value: user.mail),
+                      _InfoRow(label: 'home.dob'.tr(), value: user.dob),
+                      if (user.address.isNotEmpty)
                         _InfoRow(
-                          label: 'home.class'.tr(),
-                          value: user.className,
+                          label: 'home.address'.tr(),
+                          value: user.address,
                         ),
-                        _InfoRow(label: 'home.email'.tr(), value: user.mail),
-                        _InfoRow(label: 'home.dob'.tr(), value: user.dob),
-                        if (user.address.isNotEmpty)
-                          _InfoRow(
-                            label: 'home.address'.tr(),
-                            value: user.address,
-                          ),
-                      ],
                     ],
                   ),
                 ),
