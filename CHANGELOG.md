@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/KevinNitroG/uit_mobile/compare/v1.2.0...v1.3.0) (2026-02-26)
+
+
+### Features
+
+* Setup Android release signing ([ef72ac2](https://github.com/KevinNitroG/uit_mobile/commit/ef72ac2b22cec1eabd300900e59aca86bf3e079a))
+
+
+### Bug Fixes
+
+* deadling status showing, feat external link ([e841d11](https://github.com/KevinNitroG/uit_mobile/commit/e841d11def1a83ac7a8d125dc99b040e2ae9b80b))
+
 ## [1.2.0](https://github.com/KevinNitroG/uit_mobile/compare/v1.1.0...v1.2.0) (2026-02-25)
 
 
