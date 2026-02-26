@@ -70,6 +70,18 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Setup keystore
+        shell: bash
+        run: |
+          echo '${{ secrets.ANDROID_RELEASE_KEY }}' | base64 --decode > app/keystore.jks
+          {
+            echo 'storeFile=app/keystore.jks'
+            echo 'keyAlias=${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}'
+            echo 'storePassword=${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}'
+            echo 'keyPassword=${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}'
+          } > key.properties
+        working-directory: android
+
       - name: Build APK
         run: >-
           flutter build apk
@@ -112,6 +124,18 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Setup keystore
+        shell: bash
+        run: |
+          echo '${{ secrets.ANDROID_RELEASE_KEY }}' | base64 --decode > app/keystore.jks
+          {
+            echo 'storeFile=app/keystore.jks'
+            echo 'keyAlias=${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}'
+            echo 'storePassword=${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}'
+            echo 'keyPassword=${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}'
+          } > key.properties
+        working-directory: android
 
       - name: Build universal APK
         run: flutter build apk --release
