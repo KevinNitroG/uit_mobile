@@ -19,6 +19,21 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+    val keyProperties = java.util.Properties()
+    val keyPropertiesFile = rootProject.file("key.properties")
+    if (keyPropertiesFile.exists()) {
+        keyProperties.load(java.io.FileInputStream(keyPropertiesFile))
+    }
+
+    signingConfigs {
+        create("release") {
+            keyAlias = keyProperties["keyAlias"] as String?
+            keyPassword = keyProperties["keyPassword"] as String?
+            storeFile = if (keyProperties["storeFile"] != null) rootProject.file(keyProperties["storeFile"] as String) else null
+            storePassword = keyProperties["storePassword"] as String?
+        }
+    }
+
     defaultConfig {
         applicationId = "com.kevinnitro.uit_mobile"
         // You can update the following values to match your application needs.
@@ -31,9 +46,7 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

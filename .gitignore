@@ -1,5 +1,6 @@
-# Created by https://www.toptal.com/developers/gitignore/api/flutter
-# Edit at https://www.toptal.com/developers/gitignore?templates=flutter
+
+# Keystore file
+/android/app/upload-keystore.jks
 
 ### Flutter ###
 # Flutter/Dart/Pub related
