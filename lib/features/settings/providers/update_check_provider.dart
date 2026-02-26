@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Current app version — single source of truth for the update check.
-const kCurrentAppVersion = '1.3.0'; // x-release-please-version
+const kCurrentAppVersion = '1.3.1'; // x-release-please-version
 
 const _kGithubReleasesUrl =
     'https://api.github.com/repos/KevinNitroG/uit_mobile/releases/latest';
