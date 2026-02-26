@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 import 'package:uit_mobile/shared/widgets/main_shell.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Home/dashboard screen showing user info overview.
 class HomeScreen extends ConsumerWidget {
@@ -71,8 +72,21 @@ class HomeScreen extends ConsumerWidget {
 
               const SizedBox(height: 24),
 
+              // "More" section — navigatable feature cards
+              _SectionHeader(title: 'home.more'.tr()),
+              const SizedBox(height: 8),
+
               // Tuition fees section
               _FeesSection(ref: ref, theme: theme),
+
+              const SizedBox(height: 24),
+
+              // External links section
+              _SectionHeader(title: 'home.externalLinks'.tr()),
+              const SizedBox(height: 8),
+              _ExternalLinksSection(theme: theme),
+
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -243,7 +257,9 @@ class _QuickStats extends StatelessWidget {
               data: (deadlines) {
                 final total = deadlines.length;
                 final submitted = deadlines
-                    .where((d) => d.status == DeadlineStatus.submitted)
+                    .where(
+                      (d) => d.submittedStatus == SubmittedStatus.submitted,
+                    )
                     .length;
                 final remaining = total - submitted;
                 return '$remaining/$total';
@@ -399,17 +415,22 @@ class _FeesSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   // Progress bar
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 6,
-                      backgroundColor:
-                          theme.colorScheme.surfaceContainerHighest,
-                      valueColor: AlwaysStoppedAnimation(
-                        allPaid
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.error,
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: progress),
+                    duration: const Duration(milliseconds: 800),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, _) => ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: value,
+                        minHeight: 6,
+                        backgroundColor:
+                            theme.colorScheme.surfaceContainerHighest,
+                        valueColor: AlwaysStoppedAnimation(
+                          allPaid
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.error,
+                        ),
                       ),
                     ),
                   ),
@@ -440,6 +461,136 @@ class _FeesSection extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// External links section
+// ---------------------------------------------------------------------------
+
+class _ExternalLinksSection extends StatelessWidget {
+  final ThemeData theme;
+
+  const _ExternalLinksSection({required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    final links = [
+      _LinkItem(
+        label: 'home.linkGeneralNotice'.tr(),
+        icon: Icons.campaign_outlined,
+        url: 'https://student.uit.edu.vn/thong-bao-chung',
+      ),
+      _LinkItem(
+        label: 'home.linkStudyResult'.tr(),
+        icon: Icons.bar_chart_outlined,
+        url: 'https://student.uit.edu.vn/sinhvien/kqhoctap',
+      ),
+      _LinkItem(
+        label: 'home.linkMoodle'.tr(),
+        icon: Icons.school_outlined,
+        url: 'https://courses.uit.edu.vn/',
+      ),
+      _LinkItem(
+        label: 'home.linkYearPlan'.tr(),
+        icon: Icons.calendar_month_outlined,
+        url: 'https://student.uit.edu.vn/kehoachnam',
+      ),
+      _LinkItem(
+        label: 'home.linkStudentAffairs'.tr(),
+        icon: Icons.people_outlined,
+        url: 'https://ctsv.uit.edu.vn/',
+      ),
+      _LinkItem(
+        label: 'home.linkTrainingScore'.tr(),
+        icon: Icons.star_outline,
+        url: 'https://drl.uit.edu.vn/',
+      ),
+    ];
+
+    return GridView.count(
+      crossAxisCount: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      childAspectRatio: 1.0,
+      children: links
+          .map((item) => _LinkCard(item: item, theme: theme))
+          .toList(),
+    );
+  }
+}
+
+class _LinkItem {
+  final String label;
+  final IconData icon;
+  final String url;
+
+  const _LinkItem({required this.label, required this.icon, required this.url});
+}
+
+class _LinkCard extends StatelessWidget {
+  final _LinkItem item;
+  final ThemeData theme;
+
+  const _LinkCard({required this.item, required this.theme});
+
+  Future<void> _launch(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(item.label),
+        content: Text(item.url),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('deadlines.open'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await launchUrl(
+        Uri.parse(item.url),
+        mode: LaunchMode.externalApplication,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () => _launch(context),
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(item.icon, color: theme.colorScheme.primary, size: 28),
+              const SizedBox(height: 8),
+              Text(
+                item.label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

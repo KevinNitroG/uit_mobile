@@ -1,31 +1,35 @@
-/// Status of a deadline/assignment.
+/// Whether the deadline is still pending or already overdue.
 ///
-/// API mapping:
-///   `null`        → [DeadlineStatus.pending]   (not submitted, still within deadline)
-///   `"new"`       → [DeadlineStatus.overdue]    (not submitted, past deadline)
-///   `"submitted"` → [DeadlineStatus.submitted]  (already submitted)
-enum DeadlineStatus {
+/// Determined by comparing [Deadline.duedate] with the current time.
+enum PendingStatus {
   pending,
-  overdue,
-  submitted;
+  overdue;
 
-  /// Parses the raw API status string into a [DeadlineStatus].
-  static DeadlineStatus fromApi(String? raw) {
-    return switch (raw) {
-      'submitted' => DeadlineStatus.submitted,
-      'new' => DeadlineStatus.overdue,
-      _ => DeadlineStatus.pending,
-    };
-  }
+  @override
+  String toString() => name;
+}
 
-  /// Converts back to the API string representation.
-  String? toApi() {
-    return switch (this) {
-      DeadlineStatus.submitted => 'submitted',
-      DeadlineStatus.overdue => 'new',
-      DeadlineStatus.pending => null,
-    };
-  }
+/// The submission status from the API.
+///
+/// API values:
+///   `"submitted"` → [SubmittedStatus.submitted]
+///   `"new"`       → [SubmittedStatus.notSubmitted]
+///   `null`        → [SubmittedStatus.notSubmitted]
+enum SubmittedStatus {
+  submitted,
+  notSubmitted;
+
+  @override
+  String toString() => name;
+}
+
+/// Whether the deadline is closed for submissions.
+enum ClosedStatus {
+  open,
+  closed;
+
+  @override
+  String toString() => name;
 }
 
 /// Parses a value that may be a bool, a String ("1"/"0"/"true"/"false"), or null.
@@ -44,7 +48,12 @@ class Deadline {
   final String shortname;
   final String name;
   final String niceDate;
-  final DeadlineStatus status;
+
+  /// Unix timestamp (seconds) from the API `duedate` field.
+  final int duedate;
+
+  /// Raw status string from API: "submitted", "new", or null.
+  final String? rawStatus;
 
   /// Whether the deadline submission is closed (no longer accepting uploads).
   final bool closed;
@@ -54,12 +63,37 @@ class Deadline {
     required this.shortname,
     required this.name,
     required this.niceDate,
-    this.status = DeadlineStatus.pending,
+    required this.duedate,
+    this.rawStatus,
     this.closed = false,
   });
 
   /// URL to the assignment on the Moodle courses site.
   String get url => 'https://courses.uit.edu.vn/mod/assign/view.php?id=$id';
+
+  // ---------------------------------------------------------------------------
+  // Derived statuses
+  // ---------------------------------------------------------------------------
+
+  /// Whether the deadline is pending (duedate in the future) or overdue (past).
+  PendingStatus get pendingStatus {
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    return duedate > now ? PendingStatus.pending : PendingStatus.overdue;
+  }
+
+  /// The submission status derived from API `status` field:
+  ///   - `"submitted"` → submitted
+  ///   - `"new"` → notSubmitted
+  ///   - `null` → notSubmitted
+  SubmittedStatus get submittedStatus {
+    if (rawStatus == 'submitted') return SubmittedStatus.submitted;
+    return SubmittedStatus.notSubmitted;
+  }
+
+  /// Whether the deadline is closed or still open.
+  ClosedStatus get closedStatus {
+    return closed ? ClosedStatus.closed : ClosedStatus.open;
+  }
 
   factory Deadline.fromJson(Map<String, dynamic> json) {
     return Deadline(
@@ -67,7 +101,8 @@ class Deadline {
       shortname: json['shortname'] as String? ?? '',
       name: json['name'] as String? ?? '',
       niceDate: json['niceDate'] as String? ?? '',
-      status: DeadlineStatus.fromApi(json['status'] as String?),
+      duedate: int.tryParse(json['duedate']?.toString() ?? '0') ?? 0,
+      rawStatus: json['status'] as String?,
       closed: _parseBool(json['closed']),
     );
   }
@@ -78,8 +113,9 @@ class Deadline {
       'shortname': shortname,
       'name': name,
       'niceDate': niceDate,
-      'status': status.toApi(),
-      'closed': closed,
+      'duedate': duedate.toString(),
+      'status': rawStatus,
+      'closed': closed ? '1' : '0',
     };
   }
 }

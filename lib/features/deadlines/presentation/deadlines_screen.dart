@@ -6,7 +6,7 @@ import 'package:uit_mobile/shared/models/models.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Filter mode for deadlines.
-enum DeadlineFilter { all, pending, finished, overdue }
+enum DeadlineFilter { all, pending, submitted, overdue }
 
 /// Current filter state.
 final deadlineFilterProvider =
@@ -29,11 +29,23 @@ final filteredDeadlinesProvider = FutureProvider<List<Deadline>>((ref) async {
   return switch (filter) {
     DeadlineFilter.all => all,
     DeadlineFilter.pending =>
-      all.where((d) => d.status == DeadlineStatus.pending).toList(),
-    DeadlineFilter.finished =>
-      all.where((d) => d.status == DeadlineStatus.submitted).toList(),
+      all
+          .where(
+            (d) =>
+                d.pendingStatus == PendingStatus.pending &&
+                d.submittedStatus != SubmittedStatus.submitted,
+          )
+          .toList(),
+    DeadlineFilter.submitted =>
+      all.where((d) => d.submittedStatus == SubmittedStatus.submitted).toList(),
     DeadlineFilter.overdue =>
-      all.where((d) => d.status == DeadlineStatus.overdue).toList(),
+      all
+          .where(
+            (d) =>
+                d.pendingStatus == PendingStatus.overdue &&
+                d.submittedStatus != SubmittedStatus.submitted,
+          )
+          .toList(),
   };
 });
 
@@ -44,6 +56,7 @@ class DeadlinesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final filteredAsync = ref.watch(filteredDeadlinesProvider);
+    final allDeadlinesAsync = ref.watch(deadlinesProvider);
     final currentFilter = ref.watch(deadlineFilterProvider);
     final theme = Theme.of(context);
 
@@ -51,25 +64,53 @@ class DeadlinesScreen extends ConsumerWidget {
       appBar: AppBar(title: Text('deadlines.title'.tr())),
       body: Column(
         children: [
-          // Filter chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: DeadlineFilter.values.map((filter) {
-                final isSelected = filter == currentFilter;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(_filterLabel(filter)),
-                    selected: isSelected,
-                    onSelected: (_) {
-                      ref.read(deadlineFilterProvider.notifier).set(filter);
-                    },
-                  ),
-                );
-              }).toList(),
+          // Filter chips with counts
+          allDeadlinesAsync.when(
+            loading: () => SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: DeadlineFilter.values.map((filter) {
+                  final isSelected = filter == currentFilter;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(_filterLabel(filter, null)),
+                      selected: isSelected,
+                      onSelected: (_) {
+                        ref.read(deadlineFilterProvider.notifier).set(filter);
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
+            error: (_, _) => const SizedBox.shrink(),
+            data: (deadlines) {
+              final counts = _computeCounts(deadlines);
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Row(
+                  children: DeadlineFilter.values.map((filter) {
+                    final isSelected = filter == currentFilter;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        label: Text(_filterLabel(filter, counts)),
+                        selected: isSelected,
+                        onSelected: (_) {
+                          ref.read(deadlineFilterProvider.notifier).set(filter);
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              );
+            },
           ),
           // Deadline list
           Expanded(
@@ -123,13 +164,37 @@ class DeadlinesScreen extends ConsumerWidget {
     );
   }
 
-  String _filterLabel(DeadlineFilter filter) {
-    return switch (filter) {
+  /// Compute counts for each filter category.
+  Map<DeadlineFilter, int> _computeCounts(List<Deadline> deadlines) {
+    var pending = 0;
+    var submitted = 0;
+    var overdue = 0;
+    for (final d in deadlines) {
+      if (d.submittedStatus == SubmittedStatus.submitted) {
+        submitted++;
+      } else if (d.pendingStatus == PendingStatus.overdue) {
+        overdue++;
+      } else {
+        pending++;
+      }
+    }
+    return {
+      DeadlineFilter.all: deadlines.length,
+      DeadlineFilter.pending: pending,
+      DeadlineFilter.submitted: submitted,
+      DeadlineFilter.overdue: overdue,
+    };
+  }
+
+  String _filterLabel(DeadlineFilter filter, Map<DeadlineFilter, int>? counts) {
+    final base = switch (filter) {
       DeadlineFilter.all => 'deadlines.filterAll'.tr(),
       DeadlineFilter.pending => 'deadlines.filterPending'.tr(),
-      DeadlineFilter.finished => 'deadlines.filterFinished'.tr(),
+      DeadlineFilter.submitted => 'deadlines.filterSubmitted'.tr(),
       DeadlineFilter.overdue => 'deadlines.filterOverdue'.tr(),
     };
+    if (counts == null) return base;
+    return '$base (${counts[filter]})';
   }
 }
 
@@ -168,27 +233,22 @@ class _DeadlineTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isSubmitted = deadline.submittedStatus == SubmittedStatus.submitted;
 
-    final (
-      IconData icon,
-      Color color,
-      String badgeKey,
-    ) = switch (deadline.status) {
-      DeadlineStatus.submitted => (
-        Icons.check_circle_rounded,
-        theme.colorScheme.primary,
-        'deadlines.submitted',
-      ),
-      DeadlineStatus.overdue => (
-        Icons.assignment_late_outlined,
-        theme.colorScheme.error,
-        'deadlines.overdue',
-      ),
-      DeadlineStatus.pending => (
-        Icons.assignment_outlined,
-        theme.colorScheme.tertiary,
-        'deadlines.pending',
-      ),
+    // Determine the leading icon based on submittedStatus + pendingStatus.
+    // If submitted, always show check icon (no pending consideration).
+    final (IconData leadingIcon, Color leadingColor) = switch (isSubmitted) {
+      true => (Icons.check_circle_rounded, theme.colorScheme.primary),
+      false => switch (deadline.pendingStatus) {
+        PendingStatus.overdue => (
+          Icons.assignment_late_outlined,
+          theme.colorScheme.error,
+        ),
+        PendingStatus.pending => (
+          Icons.assignment_outlined,
+          theme.colorScheme.tertiary,
+        ),
+      },
     };
 
     return InkWell(
@@ -201,7 +261,7 @@ class _DeadlineTile extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(icon, color: color),
+              Icon(leadingIcon, color: leadingColor),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -216,6 +276,7 @@ class _DeadlineTile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
+                    // Date row
                     Row(
                       children: [
                         Icon(
@@ -233,15 +294,44 @@ class _DeadlineTile extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        _StatusBadge(label: badgeKey.tr(), color: color),
-                        if (deadline.closed) ...[
-                          const SizedBox(width: 6),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    // Status badges
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        // pendingStatus badge: only show when NOT submitted
+                        if (!isSubmitted)
                           _StatusBadge(
-                            label: 'deadlines.closed'.tr(),
-                            color: theme.colorScheme.outline,
+                            label:
+                                deadline.pendingStatus == PendingStatus.pending
+                                ? 'deadlines.pending'.tr()
+                                : 'deadlines.overdue'.tr(),
+                            color:
+                                deadline.pendingStatus == PendingStatus.pending
+                                ? theme.colorScheme.tertiary
+                                : theme.colorScheme.error,
                           ),
-                        ],
+                        // submittedStatus badge
+                        _StatusBadge(
+                          label: isSubmitted
+                              ? 'deadlines.submitted'.tr()
+                              : 'deadlines.notSubmitted'.tr(),
+                          color: isSubmitted
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.tertiary,
+                        ),
+                        // closedStatus badge
+                        _StatusBadge(
+                          label: deadline.closedStatus == ClosedStatus.closed
+                              ? 'deadlines.closed'.tr()
+                              : 'deadlines.openStatus'.tr(),
+                          color: deadline.closedStatus == ClosedStatus.closed
+                              ? theme.colorScheme.outline
+                              : theme.colorScheme.secondary,
+                        ),
                       ],
                     ),
                   ],

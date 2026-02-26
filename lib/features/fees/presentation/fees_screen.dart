@@ -4,16 +4,68 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
+/// Sort order for fees.
+enum FeeSortOrder { asc, desc }
+
+/// Current sort order state. Default: descending (newest first).
+final feeSortOrderProvider =
+    NotifierProvider<_FeeSortOrderNotifier, FeeSortOrder>(
+      _FeeSortOrderNotifier.new,
+    );
+
+class _FeeSortOrderNotifier extends Notifier<FeeSortOrder> {
+  @override
+  FeeSortOrder build() => FeeSortOrder.desc;
+
+  void toggle() {
+    state = state == FeeSortOrder.asc ? FeeSortOrder.desc : FeeSortOrder.asc;
+  }
+}
+
+/// Sorted fees based on selected sort order.
+final sortedFeesProvider = FutureProvider<List<Fee>>((ref) async {
+  final fees = await ref.watch(feesProvider.future);
+  final sortOrder = ref.watch(feeSortOrderProvider);
+
+  final sorted = List<Fee>.from(fees);
+  sorted.sort((a, b) {
+    // Compare by year first, then semester
+    final yearCmp = a.year.compareTo(b.year);
+    if (yearCmp != 0) {
+      return sortOrder == FeeSortOrder.asc ? yearCmp : -yearCmp;
+    }
+    final semCmp = a.semester.compareTo(b.semester);
+    return sortOrder == FeeSortOrder.asc ? semCmp : -semCmp;
+  });
+  return sorted;
+});
+
 /// Displays tuition fee records grouped by academic year/semester.
 class FeesScreen extends ConsumerWidget {
   const FeesScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final feesAsync = ref.watch(feesProvider);
+    final feesAsync = ref.watch(sortedFeesProvider);
+    final sortOrder = ref.watch(feeSortOrderProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text('fees.title'.tr())),
+      appBar: AppBar(
+        title: Text('fees.title'.tr()),
+        actions: [
+          IconButton(
+            icon: Icon(
+              sortOrder == FeeSortOrder.desc
+                  ? Icons.arrow_downward
+                  : Icons.arrow_upward,
+            ),
+            tooltip: sortOrder == FeeSortOrder.desc
+                ? 'exams.sortAsc'.tr()
+                : 'exams.sortDesc'.tr(),
+            onPressed: () => ref.read(feeSortOrderProvider.notifier).toggle(),
+          ),
+        ],
+      ),
       body: feesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
@@ -82,9 +134,7 @@ class FeesScreen extends ConsumerWidget {
                       progress: totalProgress,
                     );
                   }
-                  // Show most recent first.
-                  final feeIndex = fees.length - index;
-                  return _FeeCard(fee: fees[feeIndex]);
+                  return _FeeCard(fee: fees[index - 1]);
                 },
               ),
             ),
@@ -240,25 +290,15 @@ class _FeeCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Color dot indicator for paid/unpaid status
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
+                  width: 10,
+                  height: 10,
                   decoration: BoxDecoration(
                     color: fee.isPaid
-                        ? theme.colorScheme.primary.withValues(alpha: 0.12)
-                        : theme.colorScheme.error.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    fee.isPaid ? 'fees.paid'.tr() : 'fees.unpaid'.tr(),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: fee.isPaid
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.error,
-                      fontWeight: FontWeight.w600,
-                    ),
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.error,
+                    shape: BoxShape.circle,
                   ),
                 ),
               ],

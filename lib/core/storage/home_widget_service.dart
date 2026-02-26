@@ -64,7 +64,9 @@ class HomeWidgetService {
   }) {
     // Filter to only unsubmitted and not-closed deadlines (pending or overdue), take first N.
     final upcoming = deadlines
-        .where((d) => d.status != DeadlineStatus.submitted && !d.closed)
+        .where(
+          (d) => d.submittedStatus != SubmittedStatus.submitted && !d.closed,
+        )
         .take(max)
         .toList();
 
