@@ -176,15 +176,31 @@ class _ProfileCardState extends State<_ProfileCard> {
                     ),
                   ],
                 ),
-                if (_expanded) ...[
-                  const Divider(height: 24),
-                  _InfoRow(label: 'home.major'.tr(), value: user.major),
-                  _InfoRow(label: 'home.class'.tr(), value: user.className),
-                  _InfoRow(label: 'home.email'.tr(), value: user.mail),
-                  _InfoRow(label: 'home.dob'.tr(), value: user.dob),
-                  if (user.address.isNotEmpty)
-                    _InfoRow(label: 'home.address'.tr(), value: user.address),
-                ],
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_expanded) ...[
+                        const Divider(height: 24),
+                        _InfoRow(label: 'home.major'.tr(), value: user.major),
+                        _InfoRow(
+                          label: 'home.class'.tr(),
+                          value: user.className,
+                        ),
+                        _InfoRow(label: 'home.email'.tr(), value: user.mail),
+                        _InfoRow(label: 'home.dob'.tr(), value: user.dob),
+                        if (user.address.isNotEmpty)
+                          _InfoRow(
+                            label: 'home.address'.tr(),
+                            value: user.address,
+                          ),
+                      ],
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
