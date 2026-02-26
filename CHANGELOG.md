@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/KevinNitroG/uit_mobile/compare/v1.3.0...v1.3.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* bump release please because of setting build failed previously ([44327c6](https://github.com/KevinNitroG/uit_mobile/commit/44327c62c5c64b14245529083d287be06fbd5c3e))
+
 ## [1.3.0](https://github.com/KevinNitroG/uit_mobile/compare/v1.2.0...v1.3.0) (2026-02-26)
 
 
