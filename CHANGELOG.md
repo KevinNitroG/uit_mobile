@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.4.0](https://github.com/KevinNitroG/uit_mobile/compare/v1.3.1...v1.4.0) (2026-02-26)
+
+
+### Features
+
+* add smooth animation to profile card expansion ([2e09dec](https://github.com/KevinNitroG/uit_mobile/commit/2e09decd6a1d171735ddf42fa8df2f83f0dfda73))
+* improve home screen UX and fix card interaction feedback ([7764238](https://github.com/KevinNitroG/uit_mobile/commit/77642383480de1774d2a76db8dca1fe1c63fd270))
+* replace profile card animation with SizeTransition ([f4e5540](https://github.com/KevinNitroG/uit_mobile/commit/f4e55403d71df3d033417d7beabeefdee33508a7))
+
+
+### Bug Fixes
+
+* hide status dot in fee card when fully paid ([24c7178](https://github.com/KevinNitroG/uit_mobile/commit/24c7178d4229328b5b57c2b09cf14b3a82712330))
+* remove unused onTap parameter from _StatCard ([837f5af](https://github.com/KevinNitroG/uit_mobile/commit/837f5afa4e78da79e2f2fc96e96f727f0bdef1f3))
+
 ## [1.3.1](https://github.com/KevinNitroG/uit_mobile/compare/v1.3.0...v1.3.1) (2026-02-26)
 
 
