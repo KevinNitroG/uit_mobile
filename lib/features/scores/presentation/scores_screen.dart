@@ -210,9 +210,7 @@ class _SemesterScoreCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: Theme(
-        data: Theme.of(
-          context,
-        ).copyWith(dividerTheme: const DividerThemeData(space: 0)),
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           initiallyExpanded: false,
           title: Text(
@@ -280,9 +278,7 @@ class _ScoreDetailTile extends StatelessWidget {
     final gradeNum = double.tryParse(score.finalGrade ?? '');
 
     return Theme(
-      data: Theme.of(
-        context,
-      ).copyWith(dividerTheme: const DividerThemeData(space: 0)),
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 16),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),

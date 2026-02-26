@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/shared/models/models.dart';
-import 'package:uit_mobile/shared/widgets/main_shell.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Home/dashboard screen showing user info overview.
@@ -110,64 +109,84 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _ProfileCard extends StatelessWidget {
+class _ProfileCard extends StatefulWidget {
   final UserInfo user;
   final ThemeData theme;
 
   const _ProfileCard({required this.user, required this.theme});
 
   @override
+  State<_ProfileCard> createState() => _ProfileCardState();
+}
+
+class _ProfileCardState extends State<_ProfileCard> {
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
+    final user = widget.user;
+    final theme = widget.theme;
+
     return SelectionArea(
       child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 32,
-                    backgroundColor: theme.colorScheme.primaryContainer,
-                    child: Text(
-                      user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        color: theme.colorScheme.onPrimaryContainer,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => setState(() => _expanded = !_expanded),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 32,
+                      backgroundColor: theme.colorScheme.primaryContainer,
+                      child: Text(
+                        user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          color: theme.colorScheme.onPrimaryContainer,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user.name,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.name,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          user.sid,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.outline,
+                          const SizedBox(height: 4),
+                          Text(
+                            user.sid,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.outline,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                    Icon(
+                      _expanded ? Icons.expand_less : Icons.expand_more,
+                      color: theme.colorScheme.outline,
+                    ),
+                  ],
+                ),
+                if (_expanded) ...[
+                  const Divider(height: 24),
+                  _InfoRow(label: 'home.major'.tr(), value: user.major),
+                  _InfoRow(label: 'home.class'.tr(), value: user.className),
+                  _InfoRow(label: 'home.email'.tr(), value: user.mail),
+                  _InfoRow(label: 'home.dob'.tr(), value: user.dob),
+                  if (user.address.isNotEmpty)
+                    _InfoRow(label: 'home.address'.tr(), value: user.address),
                 ],
-              ),
-              const Divider(height: 24),
-              _InfoRow(label: 'home.major'.tr(), value: user.major),
-              _InfoRow(label: 'home.class'.tr(), value: user.className),
-              _InfoRow(label: 'home.email'.tr(), value: user.mail),
-              _InfoRow(label: 'home.dob'.tr(), value: user.dob),
-              if (user.address.isNotEmpty)
-                _InfoRow(label: 'home.address'.tr(), value: user.address),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -243,7 +262,6 @@ class _QuickStats extends StatelessWidget {
               },
             ),
             theme: theme,
-            onTap: () => ref.read(tabIndexProvider.notifier).switchTo(1),
           ),
         ),
         const SizedBox(width: 12),
@@ -266,7 +284,6 @@ class _QuickStats extends StatelessWidget {
               },
             ),
             theme: theme,
-            onTap: () => ref.read(tabIndexProvider.notifier).switchTo(2),
           ),
         ),
       ],
@@ -291,10 +308,10 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: onTap,
-      child: Card(
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -382,10 +399,10 @@ class _FeesSection extends StatelessWidget {
             ? ((totalDue - totalRemaining) / totalDue).clamp(0.0, 1.0)
             : 1.0;
 
-        return InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () => context.push('/fees'),
-          child: Card(
+        return Card(
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => context.push('/fees'),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -478,24 +495,9 @@ class _ExternalLinksSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final links = [
       _LinkItem(
-        label: 'home.linkGeneralNotice'.tr(),
-        icon: Icons.campaign_outlined,
-        url: 'https://student.uit.edu.vn/thong-bao-chung',
-      ),
-      _LinkItem(
-        label: 'home.linkStudyResult'.tr(),
-        icon: Icons.bar_chart_outlined,
-        url: 'https://student.uit.edu.vn/sinhvien/kqhoctap',
-      ),
-      _LinkItem(
-        label: 'home.linkMoodle'.tr(),
-        icon: Icons.school_outlined,
-        url: 'https://courses.uit.edu.vn/',
-      ),
-      _LinkItem(
-        label: 'home.linkYearPlan'.tr(),
-        icon: Icons.calendar_month_outlined,
-        url: 'https://student.uit.edu.vn/kehoachnam',
+        label: 'home.linkTrainingScore'.tr(),
+        icon: Icons.star_outline,
+        url: 'https://drl.uit.edu.vn/',
       ),
       _LinkItem(
         label: 'home.linkStudentAffairs'.tr(),
@@ -503,9 +505,24 @@ class _ExternalLinksSection extends StatelessWidget {
         url: 'https://ctsv.uit.edu.vn/',
       ),
       _LinkItem(
-        label: 'home.linkTrainingScore'.tr(),
-        icon: Icons.star_outline,
-        url: 'https://drl.uit.edu.vn/',
+        label: 'home.linkMoodle'.tr(),
+        icon: Icons.school_outlined,
+        url: 'https://courses.uit.edu.vn/',
+      ),
+      _LinkItem(
+        label: 'home.linkStudyResult'.tr(),
+        icon: Icons.bar_chart_outlined,
+        url: 'https://student.uit.edu.vn/sinhvien/kqhoctap',
+      ),
+      _LinkItem(
+        label: 'home.linkGeneralNotice'.tr(),
+        icon: Icons.campaign_outlined,
+        url: 'https://student.uit.edu.vn/thong-bao-chung',
+      ),
+      _LinkItem(
+        label: 'home.linkYearPlan'.tr(),
+        icon: Icons.calendar_month_outlined,
+        url: 'https://student.uit.edu.vn/kehoachnam',
       ),
     ];
 
@@ -565,11 +582,11 @@ class _LinkCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: () => _launch(context),
-      child: Card(
-        margin: EdgeInsets.zero,
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _launch(context),
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(

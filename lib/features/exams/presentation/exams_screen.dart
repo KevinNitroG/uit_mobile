@@ -69,6 +69,23 @@ _ExamTimeCategory _examTimeCategory(Exam exam) {
   return _ExamTimeCategory.future;
 }
 
+/// Check if today falls within the range [minExamDate, maxExamDate].
+bool _isTodayInExamRange(List<Exam> exams) {
+  DateTime? minDate;
+  DateTime? maxDate;
+  for (final exam in exams) {
+    final d = _parseExamDate(exam.date);
+    if (d == null) continue;
+    final day = DateTime(d.year, d.month, d.day);
+    if (minDate == null || day.isBefore(minDate)) minDate = day;
+    if (maxDate == null || day.isAfter(maxDate)) maxDate = day;
+  }
+  if (minDate == null || maxDate == null) return false;
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  return !today.isBefore(minDate) && !today.isAfter(maxDate);
+}
+
 /// Displays the exam schedule fetched from the student data API.
 class ExamsScreen extends ConsumerWidget {
   const ExamsScreen({super.key});
@@ -134,10 +151,19 @@ class ExamsScreen extends ConsumerWidget {
           }
 
           return SelectionArea(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              itemCount: exams.length,
-              itemBuilder: (context, index) => _ExamCard(exam: exams[index]),
+            child: Builder(
+              builder: (context) {
+                final useColors = _isTodayInExamRange(exams);
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  itemCount: exams.length,
+                  itemBuilder: (context, index) =>
+                      _ExamCard(exam: exams[index], useColors: useColors),
+                );
+              },
             ),
           );
         },
@@ -148,27 +174,37 @@ class ExamsScreen extends ConsumerWidget {
 
 class _ExamCard extends StatelessWidget {
   final Exam exam;
+  final bool useColors;
 
-  const _ExamCard({required this.exam});
+  const _ExamCard({required this.exam, required this.useColors});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final category = _examTimeCategory(exam);
 
-    // Determine card colors and border based on temporal category.
-    final Color cardColor;
+    // Only apply date-based coloring when today is within the exam range.
+    final Color? cardColor;
     final Color? borderColor;
-    switch (category) {
-      case _ExamTimeCategory.past:
-        cardColor = theme.colorScheme.primaryContainer.withValues(alpha: 0.3);
-        borderColor = null;
-      case _ExamTimeCategory.current:
-        cardColor = theme.colorScheme.tertiaryContainer.withValues(alpha: 0.3);
-        borderColor = theme.colorScheme.tertiary;
-      case _ExamTimeCategory.future:
-        cardColor = theme.colorScheme.tertiaryContainer.withValues(alpha: 0.3);
-        borderColor = null;
+    if (useColors) {
+      switch (category) {
+        case _ExamTimeCategory.past:
+          cardColor = theme.colorScheme.primaryContainer.withValues(alpha: 0.3);
+          borderColor = null;
+        case _ExamTimeCategory.current:
+          cardColor = theme.colorScheme.tertiaryContainer.withValues(
+            alpha: 0.3,
+          );
+          borderColor = theme.colorScheme.tertiary;
+        case _ExamTimeCategory.future:
+          cardColor = theme.colorScheme.tertiaryContainer.withValues(
+            alpha: 0.3,
+          );
+          borderColor = null;
+      }
+    } else {
+      cardColor = null;
+      borderColor = null;
     }
 
     // Build the date/time/room info chips.
