@@ -291,16 +291,15 @@ class _FeeCard extends StatelessWidget {
                   ),
                 ),
                 // Color dot indicator for paid/unpaid status
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: fee.isPaid
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.error,
-                    shape: BoxShape.circle,
+                if (!fee.isPaid)
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.error,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
               ],
             ),
             const SizedBox(height: 12),
