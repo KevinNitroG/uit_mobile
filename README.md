@@ -24,19 +24,19 @@ Trollstore quick link: [![Trollstore](https://img.shields.io/badge/trollstore-89
 - [x] Tuition fees screen
   > in setting account screen
 - [x] GPA calculation
-- [-] System authentication
+- [ ] System authentication
   - [x] Android
     > `androidapp://com.kevinnitro.uit_mobile`
   - [ ] iOS
     > opus 4.6 couldn't implement this
-- [-] Multiple accounts
+- [ ] Multiple accounts
   > Opus 4.6 couldn't fix it
 - [ ] Roll call
   > No, couldn't capture that api
 - [ ] Avatar
   > Couldn't/Lazy to capture the api
-- [-] Widget
-  - [-] Android (Uglyyy)
+- [ ] Widget
+  - [ ] Android (Already but uglyyy)
   - [ ] iOS (don't even work)
 
 ## Acknowledgement
