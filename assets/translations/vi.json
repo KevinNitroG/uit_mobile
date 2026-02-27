@@ -104,7 +104,7 @@
     "component4": "CK",
     "final": "Tổng kết",
     "semesterGpa": "GPA học kỳ",
-    "overallGpa": "GPA tích lũy",
+    "overallGpa": "GPA",
     "totalCredits": "Tổng tín chỉ",
     "exempted": "Miễn",
     "generalView": "Tổng quan",
@@ -149,7 +149,9 @@
     "updateLater": "Để sau",
     "checkForUpdates": "Kiểm tra cập nhật",
     "upToDate": "Ứng dụng đã là phiên bản mới nhất",
-    "debugFullResponse": "Phản hồi API đầy đủ"
+    "debugFullResponse": "Phản hồi API đầy đủ",
+    "lastUpdatedData": "Dữ liệu cập nhật lần cuối",
+    "neverFetched": "Chưa có dữ liệu nào được tải về"
   },
   "common": {
     "retry": "Thử lại",
@@ -157,21 +159,21 @@
     "remove": "Xóa",
     "refresh": "Làm mới"
   },
-   "fees": {
-     "title": "Học phí",
-     "noFees": "Không có dữ liệu học phí",
-     "summary": "Tổng quan",
-     "totalDue": "Tổng phải đóng",
-     "totalPaid": "Đã đóng",
-     "totalPreviousDebt": "Nợ trước",
-     "remaining": "Cần đóng",
-     "paidInFull": "Đã đóng đủ",
-     "paid": "Đã đóng",
-     "unpaid": "Chưa đóng",
-     "due": "Phải đóng",
-     "paidAmount": "Đã đóng",
-     "previousDebtAmount": "Nợ trước",
-     "semesterLabel": "Học kỳ {} - {}",
-     "registeredSubjects": "Môn đăng ký"
-   }
+  "fees": {
+    "title": "Học phí",
+    "noFees": "Không có dữ liệu học phí",
+    "summary": "Tổng quan",
+    "totalDue": "Tổng phải đóng",
+    "totalPaid": "Đã đóng",
+    "totalPreviousDebt": "Nợ trước",
+    "remaining": "Cần đóng",
+    "paidInFull": "Đã đóng đủ",
+    "paid": "Đã đóng",
+    "unpaid": "Chưa đóng",
+    "due": "Phải đóng",
+    "paidAmount": "Đã đóng",
+    "previousDebtAmount": "Nợ trước",
+    "semesterLabel": "Học kỳ {} - {}",
+    "registeredSubjects": "Môn đăng ký"
+  }
 }

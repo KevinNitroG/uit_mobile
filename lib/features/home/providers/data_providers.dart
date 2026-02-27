@@ -162,6 +162,17 @@ final examsProvider = FutureProvider<List<Exam>>((ref) async {
   return Exam.listFromJson(data.examsRaw);
 });
 
+/// Provides the [DateTime] of the last successful student-data network fetch,
+/// or `null` if no fetch has completed yet.  Re-evaluates whenever
+/// [studentDataProvider] emits a new value (i.e. after every background or
+/// manual refresh).
+final lastStudentDataFetchedAtProvider = Provider<DateTime?>((ref) {
+  // Re-run this provider whenever the student data changes.
+  ref.watch(studentDataProvider);
+  final cache = ref.read(hiveCacheServiceProvider);
+  return cache.getStudentDataFetchedAt();
+});
+
 /// User info provider.
 final userInfoProvider = FutureProvider<UserInfo>((ref) async {
   // Watch auth state so this provider re-runs on account switch.

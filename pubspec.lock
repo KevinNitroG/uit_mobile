@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.0"
+  animated_digit:
+    dependency: "direct main"
+    description:
+      name: animated_digit
+      sha256: e0935e46d8cd281184a5867a0666088e7b10f495a57eebd8f9e57c08bbcb2b84
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.2"
   args:
     dependency: transitive
     description:
@@ -914,6 +922,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.15"
+  timeago:
+    dependency: "direct main"
+    description:
+      name: timeago
+      sha256: b05159406a97e1cbb2b9ee4faa9fb096fe0e2dfcd8b08fcd2a00553450d3422e
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.7.1"
   typed_data:
     dependency: transitive
     description:

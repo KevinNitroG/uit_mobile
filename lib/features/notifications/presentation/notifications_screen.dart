@@ -143,34 +143,37 @@ class _NotificationTileState extends State<_NotificationTile> {
     final theme = Theme.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      child: ExpansionTile(
-        title: Text(
-          widget.notification.title,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.w600,
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          title: Text(
+            widget.notification.title,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            // When collapsed, truncate to 2 lines; when expanded, show full text.
+            maxLines: _isExpanded ? null : 2,
+            overflow: _isExpanded ? null : TextOverflow.ellipsis,
           ),
-          // When collapsed, truncate to 2 lines; when expanded, show full text.
-          maxLines: _isExpanded ? null : 2,
-          overflow: _isExpanded ? null : TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-          widget.notification.dated,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.outline,
-          ),
-        ),
-        onExpansionChanged: (expanded) {
-          setState(() => _isExpanded = expanded);
-        },
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              widget.notification.content,
-              style: theme.textTheme.bodyMedium,
+          subtitle: Text(
+            widget.notification.dated,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.outline,
             ),
           ),
-        ],
+          onExpansionChanged: (expanded) {
+            setState(() => _isExpanded = expanded);
+          },
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                widget.notification.content,
+                style: theme.textTheme.bodyMedium,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:animated_digit/animated_digit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -302,24 +303,31 @@ class _QuickStats extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _StatCard(
-            icon: Icons.assignment_outlined,
-            label: 'home.deadlines'.tr(),
-            value: deadlinesAsync.when(
-              loading: () => '...',
-              error: (_, _) => '-',
-              data: (deadlines) {
-                final total = deadlines.length;
-                final submitted = deadlines
-                    .where(
-                      (d) => d.submittedStatus == SubmittedStatus.submitted,
-                    )
-                    .length;
-                final remaining = total - submitted;
-                return '$remaining/$total';
-              },
+          child: deadlinesAsync.when(
+            loading: () => _StatCard(
+              icon: Icons.assignment_outlined,
+              label: 'home.deadlines'.tr(),
+              value: '...',
+              theme: theme,
             ),
-            theme: theme,
+            error: (_, _) => _StatCard(
+              icon: Icons.assignment_outlined,
+              label: 'home.deadlines'.tr(),
+              value: '-',
+              theme: theme,
+            ),
+            data: (deadlines) {
+              final total = deadlines.length;
+              final submitted = deadlines
+                  .where((d) => d.submittedStatus == SubmittedStatus.submitted)
+                  .length;
+              final remaining = total - submitted;
+              return _DeadlineStatCard(
+                remaining: remaining,
+                total: total,
+                theme: theme,
+              );
+            },
           ),
         ),
       ],
@@ -359,6 +367,67 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DeadlineStatCard extends StatelessWidget {
+  final int remaining;
+  final int total;
+  final ThemeData theme;
+
+  const _DeadlineStatCard({
+    required this.remaining,
+    required this.total,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final digitStyle = theme.textTheme.headlineSmall?.copyWith(
+      fontWeight: FontWeight.bold,
+    );
+    final separatorStyle = theme.textTheme.headlineSmall?.copyWith(
+      fontWeight: FontWeight.bold,
+      color: theme.colorScheme.outline,
+    );
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Icon(Icons.assignment_outlined, color: theme.colorScheme.primary),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                AnimatedDigitWidget(
+                  value: remaining,
+                  textStyle: digitStyle,
+                  duration: const Duration(milliseconds: 600),
+                ),
+                Text('/', style: separatorStyle),
+                AnimatedDigitWidget(
+                  value: total,
+                  textStyle: digitStyle,
+                  duration: const Duration(milliseconds: 600),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'home.deadlines'.tr(),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.outline,
               ),

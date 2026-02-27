@@ -2,7 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:uit_mobile/features/auth/providers/auth_provider.dart';
+import 'package:uit_mobile/features/home/providers/data_providers.dart';
 import 'package:uit_mobile/features/settings/providers/update_check_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -138,6 +140,8 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 _UpdateCheckTile(updateState: updateState, ref: ref),
+                const Divider(height: 1),
+                const _LastUpdatedTile(),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.bug_report_outlined),
@@ -283,6 +287,50 @@ class _UpdateCheckTile extends StatelessWidget {
         onTap: () => ref.read(updateCheckProvider.notifier).recheck(),
       ),
     };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Last-updated-data tile — shows the timestamp of the last successful fetch
+// ---------------------------------------------------------------------------
+
+class _LastUpdatedTile extends ConsumerWidget {
+  const _LastUpdatedTile();
+
+  String _formatTimestamp(DateTime dt) {
+    final date =
+        '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+    final time =
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
+    return '$date $time';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final fetchedAt = ref.watch(lastStudentDataFetchedAtProvider);
+    final theme = Theme.of(context);
+
+    return ListTile(
+      leading: const Icon(Icons.update_outlined),
+      title: Text('settings.lastUpdatedData'.tr()),
+      subtitle: fetchedAt == null
+          ? Text(
+              'settings.neverFetched'.tr(),
+              style: TextStyle(color: theme.colorScheme.outline),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(_formatTimestamp(fetchedAt)),
+                Text(
+                  timeago.format(fetchedAt),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
+                ),
+              ],
+            ),
+    );
   }
 }
 

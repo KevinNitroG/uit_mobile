@@ -47,25 +47,25 @@
     "chooseAccount": "Choose an account",
     "chooseAccountSubtitle": "Select an account to continue"
   },
-   "timetable": {
-     "title": "Timetable",
-     "noCourses": "No courses found",
-     "period": "Period {}",
-     "periodInfo": "Period Info",
-      "ht2Title": "HT2 - TTTN - KLTN",
-     "noHt2Courses": "No HT2 classes found",
-     "ht2MeetingSchedule": "Meeting Schedule",
-     "ht2NoScheduleYet": "No meeting schedule yet",
-     "days": {
-       "mon": "Mon",
-       "tue": "Tue",
-       "wed": "Wed",
-       "thu": "Thu",
-       "fri": "Fri",
-       "sat": "Sat",
-       "sun": "Sun"
-     }
-   },
+  "timetable": {
+    "title": "Timetable",
+    "noCourses": "No courses found",
+    "period": "Period {}",
+    "periodInfo": "Period Info",
+    "ht2Title": "HT2 - TTTN - KLTN",
+    "noHt2Courses": "No HT2 classes found",
+    "ht2MeetingSchedule": "Meeting Schedule",
+    "ht2NoScheduleYet": "No meeting schedule yet",
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    }
+  },
   "deadlines": {
     "title": "Deadlines",
     "noDeadlines": "No upcoming deadlines",
@@ -104,7 +104,7 @@
     "component4": "CK",
     "final": "Final",
     "semesterGpa": "Semester GPA",
-    "overallGpa": "Overall GPA",
+    "overallGpa": "GPA",
     "totalCredits": "Total Credits",
     "exempted": "Exempted",
     "generalView": "General View",
@@ -149,7 +149,9 @@
     "updateDownload": "Download",
     "updateLater": "Later",
     "checkForUpdates": "Check for Updates",
-    "upToDate": "App is up to date"
+    "upToDate": "App is up to date",
+    "lastUpdatedData": "Last Updated Data",
+    "neverFetched": "Data has not been fetched yet"
   },
   "common": {
     "retry": "Retry",
@@ -157,21 +159,21 @@
     "remove": "Remove",
     "refresh": "Refresh"
   },
-   "fees": {
-     "title": "Tuition Fees",
-     "noFees": "No fee records found",
-     "summary": "Summary",
-     "totalDue": "Total Due",
-     "totalPaid": "Total Paid",
-     "totalPreviousDebt": "Previous Debt",
-     "remaining": "Remaining",
-     "paidInFull": "Paid in full",
-     "paid": "Paid",
-     "unpaid": "Unpaid",
-     "due": "Due",
-     "paidAmount": "Paid",
-     "previousDebtAmount": "Previous Debt",
-     "semesterLabel": "Semester {} - {}",
-     "registeredSubjects": "Registered Subjects"
-   }
+  "fees": {
+    "title": "Tuition Fees",
+    "noFees": "No fee records found",
+    "summary": "Summary",
+    "totalDue": "Total Due",
+    "totalPaid": "Total Paid",
+    "totalPreviousDebt": "Previous Debt",
+    "remaining": "Remaining",
+    "paidInFull": "Paid in full",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "due": "Due",
+    "paidAmount": "Paid",
+    "previousDebtAmount": "Previous Debt",
+    "semesterLabel": "Semester {} - {}",
+    "registeredSubjects": "Registered Subjects"
+  }
 }

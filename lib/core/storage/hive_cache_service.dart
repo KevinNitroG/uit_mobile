@@ -22,6 +22,7 @@ class HiveCacheService {
       Hive.openBox<String>(HiveBoxes.userInfo),
       Hive.openBox<String>(HiveBoxes.exams),
       Hive.openBox<String>(HiveBoxes.fees),
+      Hive.openBox<String>(HiveBoxes.metadata),
     ]);
   }
 
@@ -60,6 +61,33 @@ class HiveCacheService {
     await put(HiveBoxes.deadlines, 'data', data['deadline']);
     await put(HiveBoxes.exams, 'data', data['exams']);
     await put(HiveBoxes.fees, 'data', data['fee']);
+    // Record the timestamp of this successful fetch.
+    await _setMetadata(
+      HiveMetadataKeys.studentDataFetchedAt,
+      DateTime.now().toIso8601String(),
+    );
+  }
+
+  /// Returns the [DateTime] of the last successful student-data fetch, or
+  /// `null` if no fetch has been completed yet.
+  DateTime? getStudentDataFetchedAt() {
+    final raw = _getMetadata(HiveMetadataKeys.studentDataFetchedAt);
+    if (raw == null) return null;
+    return DateTime.tryParse(raw);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Internal metadata helpers (raw string — not JSON-encoded)
+  // ---------------------------------------------------------------------------
+
+  Future<void> _setMetadata(String key, String value) async {
+    final box = Hive.box<String>(HiveBoxes.metadata);
+    await box.put(key, value);
+  }
+
+  String? _getMetadata(String key) {
+    final box = Hive.box<String>(HiveBoxes.metadata);
+    return box.get(key);
   }
 
   List<dynamic>? getCachedCourses() => get(HiveBoxes.courses, 'data') as List?;
