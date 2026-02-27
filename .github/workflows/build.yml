@@ -97,10 +97,11 @@ jobs:
           done
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: apk-${{ matrix.artifact }}
-          path: build/app/outputs/flutter-apk/*.apk
+          path: build/app/outputs/flutter-apk/uit-mobile-${{ matrix.artifact }}.apk
+          archive: false
 
   build-apk-universal:
     runs-on: ubuntu-latest
@@ -145,10 +146,11 @@ jobs:
         run: mv app-release.apk uit-mobile-universal.apk
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: apk-universal
           path: build/app/outputs/flutter-apk/uit-mobile-universal.apk
+          archive: false
 
   build-ipa:
     runs-on: macos-latest
@@ -178,7 +180,8 @@ jobs:
           zip -qq -r -9 uit-mobile.ipa Payload
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ipa
-          path: build/ios/archive/Runner.xcarchive/Products/Applications/*.ipa
+          path: build/ios/archive/Runner.xcarchive/Products/Applications/uit-mobile.ipa
+          archive: false
