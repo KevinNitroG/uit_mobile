@@ -136,15 +136,22 @@ class _SemesterCard extends StatelessWidget {
           ),
 
           // ── Table ────────────────────────────────────────────────────────
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 270, maxWidth: 400),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
-                child: _ScoreTable(scores: semester.scores),
-              ),
-            ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Clamp the table width: at least 300px, at most 620px,
+              // but never wider than the available space.
+              final outerWidth = constraints.maxWidth.clamp(300.0, 620.0);
+              return Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: outerWidth,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: _ScoreTable(scores: semester.scores),
+                  ),
+                ),
+              );
+            },
           ),
 
           const SizedBox(height: 4),

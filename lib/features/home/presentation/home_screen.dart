@@ -396,7 +396,6 @@ class _DeadlineStatCard extends StatelessWidget {
     );
     final separatorStyle = theme.textTheme.headlineSmall?.copyWith(
       fontWeight: FontWeight.bold,
-      color: theme.colorScheme.outline,
     );
 
     return Card(

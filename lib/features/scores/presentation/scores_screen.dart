@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uit_mobile/features/home/providers/data_providers.dart';
+import 'package:uit_mobile/features/scores/utils/gpa_converter.dart';
 import 'package:uit_mobile/shared/models/models.dart';
 
 /// Score classification thresholds (Vietnamese grading system).
@@ -131,14 +132,43 @@ class ScoresScreen extends ConsumerWidget {
 }
 
 /// Card showing the overall GPA summary at the top.
-class _OverallGpaCard extends StatelessWidget {
+///
+/// Tap the GPA badge to cycle through display modes:
+///   10-point → 4-point → Letter grade → back to 10-point
+class _OverallGpaCard extends StatefulWidget {
   final ({double gpa, int creditsStudied, int creditsAccumulated})? gpaResult;
 
   const _OverallGpaCard({required this.gpaResult});
 
   @override
+  State<_OverallGpaCard> createState() => _OverallGpaCardState();
+}
+
+class _OverallGpaCardState extends State<_OverallGpaCard> {
+  GpaDisplayMode _mode = GpaDisplayMode.tenPoint;
+
+  void _cycleMode() {
+    if (widget.gpaResult == null) return;
+    setState(() => _mode = _mode.next);
+  }
+
+  /// Returns a classification label appropriate for the current display mode.
+  ///
+  /// - tenPoint: 10-pt class (Xuất sắc / Giỏi / Khá / Trung bình / Yếu)
+  /// - fourPoint / letter: graduation class based on linearly-scaled 4-pt GPA
+  String? _classificationLabel() {
+    final gpa = widget.gpaResult?.gpa;
+    if (gpa == null) return null;
+    if (_mode == GpaDisplayMode.tenPoint) return tenPointClass(gpa);
+    final gpa4 = overallTenToFour(gpa);
+    return graduationClass(gpa4);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final gpaResult = widget.gpaResult;
+    final classLabel = _classificationLabel();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -160,38 +190,102 @@ class _OverallGpaCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   if (gpaResult != null) ...[
                     Text(
-                      '${'scores.creditsStudied'.tr()}: ${gpaResult!.creditsStudied}',
+                      '${'scores.creditsStudied'.tr()}: ${gpaResult.creditsStudied}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.outline,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${'scores.creditsAccumulated'.tr()}: ${gpaResult!.creditsAccumulated}',
+                      '${'scores.creditsAccumulated'.tr()}: ${gpaResult.creditsAccumulated}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.outline,
                       ),
                     ),
+                    if (classLabel != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        classLabel,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ],
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: _scoreColor(theme, gpaResult?.gpa),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                gpaResult != null ? gpaResult!.gpa.toStringAsFixed(2) : '-',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+            // Tappable GPA badge — cycles through display modes
+            Tooltip(
+              message: 'Tap to switch scale',
+              child: GestureDetector(
+                onTap: _cycleMode,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  transitionBuilder: (child, animation) =>
+                      ScaleTransition(scale: animation, child: child),
+                  child: _GpaBadge(
+                    key: ValueKey(_mode),
+                    gpaText: gpaResult != null
+                        ? formatGpa(gpaResult.gpa, _mode)
+                        : '-',
+                    modeLabel: _mode.label,
+                    color: _scoreColor(theme, gpaResult?.gpa),
+                    theme: theme,
+                  ),
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Compact badge that shows the GPA value and current scale label.
+class _GpaBadge extends StatelessWidget {
+  final String gpaText;
+  final String modeLabel;
+  final Color color;
+  final ThemeData theme;
+
+  const _GpaBadge({
+    super.key,
+    required this.gpaText,
+    required this.modeLabel,
+    required this.color,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            gpaText,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            modeLabel,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: Colors.white.withValues(alpha: 0.85),
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
       ),
     );
   }
