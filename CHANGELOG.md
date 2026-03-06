@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/KevinNitroG/uit_mobile/compare/v1.4.0...v1.5.0) (2026-03-06)
+
+
+### Features
+
+* animate home deadlines, show last updated student data in settings, and transparent expansion dividers. Integrate animated_digit and timeago packages. Update Hive persistence for last data fetch timestamp. ([dfdbc24](https://github.com/KevinNitroG/uit_mobile/commit/dfdbc246572d9243a6e9e5cbf0a08f49d78db305))
+* **scores:** add GPA conversion (10pt, 4pt, letter), fix graduation classification and table centering ([55bdb16](https://github.com/KevinNitroG/uit_mobile/commit/55bdb16b2fc460eaf3986e5d0408230e3928f72a))
+
+
+### Documentation
+
+* **README:** no [-] bcs github cannot render that ([e9a6976](https://github.com/KevinNitroG/uit_mobile/commit/e9a69762ee3b13ac3608ef9128cb3360e76ad82b))
+
 ## [1.4.0](https://github.com/KevinNitroG/uit_mobile/compare/v1.3.1...v1.4.0) (2026-02-26)
 
 
