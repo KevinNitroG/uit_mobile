@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/KevinNitroG/uit_mobile/compare/v1.5.0...v1.5.1) (2026-03-10)
+
+
+### Documentation
+
+* **README:** download badge ([c11799c](https://github.com/KevinNitroG/uit_mobile/commit/c11799cff4491d58ce2ac54553e0994f47ee5a88))
+
 ## [1.5.0](https://github.com/KevinNitroG/uit_mobile/compare/v1.4.0...v1.5.0) (2026-03-06)
 
 
