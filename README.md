@@ -1,5 +1,7 @@
 # UIT Mobile
 
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/KevinNitroG/uit_mobile/total?style=for-the-badge&color=b4befe)
+
 A vibe coded flutter app for android (13+) and iOS (15+)
 
 > No further development, this is garbage from AI, cannot be maintained
